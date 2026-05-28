@@ -29,41 +29,95 @@ import type {
   MarketEventType,
 } from '../types/contract'
 
-// ---- 静态注册表 ----------------------------------------------------------
+// ---- 静态注册表（自动生成）-----------------------------------------------
 // index.json 与全部关卡文件在编译期静态引入。
-// 新增/删除关卡时同步维护此处与 levelIndex 即可。
+// 下方 BEGIN..END 之间的内容由 `node tools/build-levels.mjs` 自动生成，请勿手改：
+// 该脚本扫描 src/assets/levels/**/level_*.json，重建本注册表与 index.json。
+// 新增关卡（含 generated_real/ 真实数据）后重跑该脚本即可。
 import levelIndexJson from '../assets/levels/index.json'
-import level_0001 from '../assets/levels/level_0001.json'
-import level_0002 from '../assets/levels/level_0002.json'
-import level_0003 from '../assets/levels/level_0003.json'
-import level_0004 from '../assets/levels/level_0004.json'
-import level_0005 from '../assets/levels/level_0005.json'
-import level_0006 from '../assets/levels/level_0006.json'
-import level_0007 from '../assets/levels/level_0007.json'
-import level_0008 from '../assets/levels/level_0008.json'
-import level_0009 from '../assets/levels/level_0009.json'
-import level_0010 from '../assets/levels/level_0010.json'
-import level_0011 from '../assets/levels/level_0011.json'
-import level_0012 from '../assets/levels/level_0012.json'
+// >>> LEVELS:GENERATED:BEGIN
+import level_0001_json from '../assets/levels/level_0001.json'
+import level_0002_json from '../assets/levels/level_0002.json'
+import level_0003_json from '../assets/levels/level_0003.json'
+import level_0004_json from '../assets/levels/level_0004.json'
+import level_0005_json from '../assets/levels/level_0005.json'
+import level_0006_json from '../assets/levels/level_0006.json'
+import level_0007_json from '../assets/levels/level_0007.json'
+import level_0008_json from '../assets/levels/level_0008.json'
+import level_0009_json from '../assets/levels/level_0009.json'
+import level_0010_json from '../assets/levels/level_0010.json'
+import level_0011_json from '../assets/levels/level_0011.json'
+import level_0012_json from '../assets/levels/level_0012.json'
+import generated_real_level_b0001_json from '../assets/levels/generated_real/level_b0001.json'
+import generated_real_level_b0002_json from '../assets/levels/generated_real/level_b0002.json'
+import generated_real_level_b0003_json from '../assets/levels/generated_real/level_b0003.json'
+import generated_real_level_b0004_json from '../assets/levels/generated_real/level_b0004.json'
+import generated_real_level_b0005_json from '../assets/levels/generated_real/level_b0005.json'
+import generated_real_level_b0006_json from '../assets/levels/generated_real/level_b0006.json'
+import generated_real_level_b0007_json from '../assets/levels/generated_real/level_b0007.json'
+import generated_real_level_b0008_json from '../assets/levels/generated_real/level_b0008.json'
+import generated_real_level_b0009_json from '../assets/levels/generated_real/level_b0009.json'
+import generated_real_level_b0010_json from '../assets/levels/generated_real/level_b0010.json'
+import generated_real_level_b0011_json from '../assets/levels/generated_real/level_b0011.json'
+import generated_real_level_b0012_json from '../assets/levels/generated_real/level_b0012.json'
+import generated_real_level_b0013_json from '../assets/levels/generated_real/level_b0013.json'
+import generated_real_level_b0014_json from '../assets/levels/generated_real/level_b0014.json'
+import generated_real_level_b0015_json from '../assets/levels/generated_real/level_b0015.json'
+import generated_real_level_b0016_json from '../assets/levels/generated_real/level_b0016.json'
+import generated_real_level_b0017_json from '../assets/levels/generated_real/level_b0017.json'
+import generated_real_level_b0018_json from '../assets/levels/generated_real/level_b0018.json'
+import generated_real_level_b0019_json from '../assets/levels/generated_real/level_b0019.json'
+import generated_real_level_b0020_json from '../assets/levels/generated_real/level_b0020.json'
+import generated_real_level_b0021_json from '../assets/levels/generated_real/level_b0021.json'
+import generated_real_level_b0022_json from '../assets/levels/generated_real/level_b0022.json'
+import generated_real_level_b0023_json from '../assets/levels/generated_real/level_b0023.json'
+import generated_real_level_b0024_json from '../assets/levels/generated_real/level_b0024.json'
+import generated_real_level_b0025_json from '../assets/levels/generated_real/level_b0025.json'
 
 /**
  * 关卡文件注册表：file 名 -> 原始 JSON 模块。
  * key 与 index.json 中每个条目的 `file` 字段一致。
  */
 const LEVEL_MODULES: Record<string, unknown> = {
-  'level_0001.json': level_0001,
-  'level_0002.json': level_0002,
-  'level_0003.json': level_0003,
-  'level_0004.json': level_0004,
-  'level_0005.json': level_0005,
-  'level_0006.json': level_0006,
-  'level_0007.json': level_0007,
-  'level_0008.json': level_0008,
-  'level_0009.json': level_0009,
-  'level_0010.json': level_0010,
-  'level_0011.json': level_0011,
-  'level_0012.json': level_0012,
+  'level_0001.json': level_0001_json,
+  'level_0002.json': level_0002_json,
+  'level_0003.json': level_0003_json,
+  'level_0004.json': level_0004_json,
+  'level_0005.json': level_0005_json,
+  'level_0006.json': level_0006_json,
+  'level_0007.json': level_0007_json,
+  'level_0008.json': level_0008_json,
+  'level_0009.json': level_0009_json,
+  'level_0010.json': level_0010_json,
+  'level_0011.json': level_0011_json,
+  'level_0012.json': level_0012_json,
+  'generated_real/level_b0001.json': generated_real_level_b0001_json,
+  'generated_real/level_b0002.json': generated_real_level_b0002_json,
+  'generated_real/level_b0003.json': generated_real_level_b0003_json,
+  'generated_real/level_b0004.json': generated_real_level_b0004_json,
+  'generated_real/level_b0005.json': generated_real_level_b0005_json,
+  'generated_real/level_b0006.json': generated_real_level_b0006_json,
+  'generated_real/level_b0007.json': generated_real_level_b0007_json,
+  'generated_real/level_b0008.json': generated_real_level_b0008_json,
+  'generated_real/level_b0009.json': generated_real_level_b0009_json,
+  'generated_real/level_b0010.json': generated_real_level_b0010_json,
+  'generated_real/level_b0011.json': generated_real_level_b0011_json,
+  'generated_real/level_b0012.json': generated_real_level_b0012_json,
+  'generated_real/level_b0013.json': generated_real_level_b0013_json,
+  'generated_real/level_b0014.json': generated_real_level_b0014_json,
+  'generated_real/level_b0015.json': generated_real_level_b0015_json,
+  'generated_real/level_b0016.json': generated_real_level_b0016_json,
+  'generated_real/level_b0017.json': generated_real_level_b0017_json,
+  'generated_real/level_b0018.json': generated_real_level_b0018_json,
+  'generated_real/level_b0019.json': generated_real_level_b0019_json,
+  'generated_real/level_b0020.json': generated_real_level_b0020_json,
+  'generated_real/level_b0021.json': generated_real_level_b0021_json,
+  'generated_real/level_b0022.json': generated_real_level_b0022_json,
+  'generated_real/level_b0023.json': generated_real_level_b0023_json,
+  'generated_real/level_b0024.json': generated_real_level_b0024_json,
+  'generated_real/level_b0025.json': generated_real_level_b0025_json,
 }
+// <<< LEVELS:GENERATED:END
 
 // ---- 错误类型 ------------------------------------------------------------
 
