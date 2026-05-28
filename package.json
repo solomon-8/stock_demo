@@ -13,7 +13,8 @@
     "build:h5": "taro build --type h5",
     "test": "vitest run",
     "test:watch": "vitest",
-    "gen:seed": "node tools/gen-seed.mjs"
+    "gen:seed": "node tools/gen-seed.mjs",
+    "smoke": "node tools/smoke.mjs"
   },
   "browserslist": [
     "last 3 versions",
@@ -48,6 +49,7 @@
     "@types/react-dom": "^18.3.0",
     "babel-preset-taro": "4.0.9",
     "postcss": "^8.4.35",
+    "puppeteer-core": "^22.0.0",
     "typescript": "^5.4.0",
     "vitest": "^1.6.0",
     "webpack": "5.91.0"
