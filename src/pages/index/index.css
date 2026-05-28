@@ -1,0 +1,61 @@
+.index-page {
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+/* 居中态：加载 / 错误 */
+.index-page--center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  text-align: center;
+}
+
+/* 游戏进行中：单列纵向，移动优先 */
+.index-page--play {
+  display: block;
+  padding: 8px 8px 24px;
+}
+
+.index-page--result {
+  display: block;
+  padding: 0;
+}
+
+.index-page__chart {
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #161b22;
+  margin-bottom: 8px;
+}
+
+.index-page__panel {
+  width: 100%;
+}
+
+.index-page__title {
+  display: block;
+  font-size: 40px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.index-page__hint {
+  display: block;
+  font-size: 24px;
+  color: #8b949e;
+  line-height: 1.6;
+}
+
+.index-page__retry {
+  margin-top: 24px;
+  background: #238636;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-size: 24px;
+}

@@ -1,0 +1,112 @@
+{
+  "levels": [
+    {
+      "levelId": "level_0001",
+      "difficulty": "easy",
+      "outcomeTags": [
+        "surge"
+      ],
+      "totalDays": 42,
+      "file": "level_0001.json"
+    },
+    {
+      "levelId": "level_0002",
+      "difficulty": "normal",
+      "outcomeTags": [
+        "crash"
+      ],
+      "totalDays": 58,
+      "file": "level_0002.json"
+    },
+    {
+      "levelId": "level_0003",
+      "difficulty": "hard",
+      "outcomeTags": [
+        "delisted"
+      ],
+      "totalDays": 30,
+      "file": "level_0003.json"
+    },
+    {
+      "levelId": "level_0004",
+      "difficulty": "hard",
+      "outcomeTags": [
+        "long-halt"
+      ],
+      "totalDays": 54,
+      "file": "level_0004.json"
+    },
+    {
+      "levelId": "level_0005",
+      "difficulty": "normal",
+      "outcomeTags": [
+        "normal-halt"
+      ],
+      "totalDays": 38,
+      "file": "level_0005.json"
+    },
+    {
+      "levelId": "level_0006",
+      "difficulty": "easy",
+      "outcomeTags": [
+        "flat"
+      ],
+      "totalDays": 59,
+      "file": "level_0006.json"
+    },
+    {
+      "levelId": "level_0007",
+      "difficulty": "hard",
+      "outcomeTags": [
+        "st"
+      ],
+      "totalDays": 53,
+      "file": "level_0007.json"
+    },
+    {
+      "levelId": "level_0008",
+      "difficulty": "easy",
+      "outcomeTags": [
+        "surge"
+      ],
+      "totalDays": 37,
+      "file": "level_0008.json"
+    },
+    {
+      "levelId": "level_0009",
+      "difficulty": "normal",
+      "outcomeTags": [
+        "crash"
+      ],
+      "totalDays": 56,
+      "file": "level_0009.json"
+    },
+    {
+      "levelId": "level_0010",
+      "difficulty": "hard",
+      "outcomeTags": [
+        "st"
+      ],
+      "totalDays": 56,
+      "file": "level_0010.json"
+    },
+    {
+      "levelId": "level_0011",
+      "difficulty": "normal",
+      "outcomeTags": [
+        "normal-halt"
+      ],
+      "totalDays": 57,
+      "file": "level_0011.json"
+    },
+    {
+      "levelId": "level_0012",
+      "difficulty": "easy",
+      "outcomeTags": [
+        "flat"
+      ],
+      "totalDays": 49,
+      "file": "level_0012.json"
+    }
+  ]
+}

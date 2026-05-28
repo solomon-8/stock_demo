@@ -1,0 +1,68 @@
+{
+  "levels": [
+    {
+      "levelId": "level_b0001",
+      "difficulty": "easy",
+      "outcomeTags": [
+        "surge"
+      ],
+      "totalDays": 59,
+      "file": "generated/level_b0001.json"
+    },
+    {
+      "levelId": "level_b0002",
+      "difficulty": "normal",
+      "outcomeTags": [
+        "crash"
+      ],
+      "totalDays": 35,
+      "file": "generated/level_b0002.json"
+    },
+    {
+      "levelId": "level_b0003",
+      "difficulty": "easy",
+      "outcomeTags": [
+        "flat"
+      ],
+      "totalDays": 49,
+      "file": "generated/level_b0003.json"
+    },
+    {
+      "levelId": "level_b0004",
+      "difficulty": "normal",
+      "outcomeTags": [
+        "normal-halt"
+      ],
+      "totalDays": 36,
+      "file": "generated/level_b0004.json"
+    },
+    {
+      "levelId": "level_b0005",
+      "difficulty": "hard",
+      "outcomeTags": [
+        "long-halt"
+      ],
+      "totalDays": 47,
+      "file": "generated/level_b0005.json"
+    },
+    {
+      "levelId": "level_b0006",
+      "difficulty": "hard",
+      "outcomeTags": [
+        "st"
+      ],
+      "totalDays": 39,
+      "file": "generated/level_b0006.json"
+    },
+    {
+      "levelId": "level_b0007",
+      "difficulty": "hard",
+      "outcomeTags": [
+        "delisted",
+        "st"
+      ],
+      "totalDays": 58,
+      "file": "generated/level_b0007.json"
+    }
+  ]
+}

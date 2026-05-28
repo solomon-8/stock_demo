@@ -1,0 +1,168 @@
+.trade-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+  background: #161b22;
+  border-radius: 12px;
+  color: #e6edf3;
+}
+
+/* 资产概览 */
+.trade-panel__summary {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 0;
+  border-bottom: 1px solid #21262d;
+}
+
+.trade-panel__summary-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.trade-panel__label {
+  font-size: 24px;
+  color: #8b949e;
+}
+
+.trade-panel__value {
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.trade-panel__value--strong {
+  font-size: 32px;
+  color: #f0c000;
+}
+
+.trade-panel__sub {
+  font-size: 22px;
+  color: #8b949e;
+  font-weight: 400;
+}
+
+.trade-panel__delta {
+  font-size: 24px;
+  color: #8b949e;
+}
+
+/* 红涨绿跌（A 股惯例） */
+.trade-panel__delta--up {
+  color: #f85149;
+}
+
+.trade-panel__delta--down {
+  color: #3fb950;
+}
+
+/* 停牌 / 结束提示 */
+.trade-panel__halt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: #1c2128;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+}
+
+.trade-panel__halt-text {
+  font-size: 26px;
+  color: #d29922;
+}
+
+/* 交易区块 */
+.trade-panel__section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.trade-panel__section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.trade-panel__section-title {
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.trade-panel__section-meta {
+  font-size: 24px;
+  color: #8b949e;
+}
+
+.trade-panel__slider {
+  width: 100%;
+}
+
+/* 快捷档 */
+.trade-panel__quick {
+  display: flex;
+  gap: 12px;
+}
+
+.trade-panel__quick-btn {
+  flex: 1;
+  margin: 0;
+  padding: 0;
+  font-size: 24px;
+  line-height: 64px;
+  height: 64px;
+  background: #21262d;
+  color: #e6edf3;
+  border-radius: 8px;
+}
+
+.trade-panel__quick-btn--active {
+  background: #1f6feb;
+  color: #ffffff;
+}
+
+/* 主按钮 */
+.trade-panel__btn {
+  margin: 0;
+  font-size: 28px;
+  line-height: 80px;
+  height: 80px;
+  border-radius: 8px;
+  color: #ffffff;
+}
+
+.trade-panel__btn[disabled] {
+  opacity: 0.4;
+}
+
+.trade-panel__btn--buy {
+  background: #f85149;
+}
+
+.trade-panel__btn--sell {
+  background: #3fb950;
+}
+
+.trade-panel__btn--resume {
+  background: #d29922;
+  width: 100%;
+}
+
+.trade-panel__actions {
+  display: flex;
+  gap: 12px;
+}
+
+.trade-panel__btn--hold {
+  flex: 1;
+  background: #30363d;
+}
+
+.trade-panel__btn--advance {
+  flex: 1;
+  background: #1f6feb;
+}

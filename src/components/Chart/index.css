@@ -1,0 +1,13 @@
+/* K 线图容器。klinecharts 在内部创建 canvas，需要一个有确定尺寸的块级容器。 */
+.kline-chart {
+  display: block;
+  width: 100%;
+  min-height: 240px;
+  position: relative;
+  box-sizing: border-box;
+}
+
+/* H5 下 Taro 的 View 会编译为带 taro 前缀的元素，确保 canvas 充满容器。 */
+.kline-chart canvas {
+  display: block;
+}

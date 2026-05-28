@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover"
+  />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>匿名股神</title>
+  <script>
+    !(function (window, document) {
+      var lastTime = 0
+      var prefixes = 'webkit moz ms o'.split(' ')
+      var requestAnimationFrame = window.requestAnimationFrame
+      var cancelAnimationFrame = window.cancelAnimationFrame
+      var prefix
+      for (var i = 0; i < prefixes.length; i++) {
+        if (requestAnimationFrame && cancelAnimationFrame) break
+        prefix = prefixes[i]
+        requestAnimationFrame = requestAnimationFrame || window[prefix + 'RequestAnimationFrame']
+        cancelAnimationFrame =
+          cancelAnimationFrame ||
+          window[prefix + 'CancelAnimationFrame'] ||
+          window[prefix + 'CancelRequestAnimationFrame']
+      }
+      if (!requestAnimationFrame || !cancelAnimationFrame) {
+        requestAnimationFrame = function (callback) {
+          var currTime = new Date().getTime()
+          var timeToCall = Math.max(0, 16 - (currTime - lastTime))
+          var id = window.setTimeout(function () {
+            callback(currTime + timeToCall)
+          }, timeToCall)
+          lastTime = currTime + timeToCall
+          return id
+        }
+        cancelAnimationFrame = function (id) {
+          window.clearTimeout(id)
+        }
+      }
+      window.requestAnimationFrame = requestAnimationFrame
+      window.cancelAnimationFrame = cancelAnimationFrame
+    })(window, document)
+  </script>
+</head>
+<body>
+  <div id="app"></div>
+</body>
+</html>
