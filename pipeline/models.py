@@ -34,6 +34,7 @@ class RawBar:
     close: float
     volume: float  # 成交量（股）
     amount: Optional[float] = None  # 成交额（元），用于量比/换手校验，可选
+    turnover: Optional[float] = None  # 当日换手率%（数据源直供，如 baostock turn 字段），可选
     tradable: bool = True  # 当日是否可交易（停牌为 False）
     is_st: bool = False  # 当日是否处于 ST 状态
     is_delisted: bool = False  # 当日是否已退市/退市整理期

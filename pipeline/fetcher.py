@@ -164,7 +164,7 @@ class BaostockFetcher(BaseFetcher):
 
         def _query():
             self.limiter.wait()
-            fields = "date,open,high,low,close,volume,amount,tradestatus,isST"
+            fields = "date,open,high,low,close,volume,amount,turn,tradestatus,isST"
             rs = bs.query_history_k_data_plus(
                 code, fields, start_date=start, end_date=end, frequency="d", adjustflag="3"
             )
@@ -179,7 +179,7 @@ class BaostockFetcher(BaseFetcher):
 
         bars: List[RawBar] = []
         for r in rows:
-            date, o, h, l, c, vol, amt, status, is_st = r
+            date, o, h, l, c, vol, amt, turn, status, is_st = r
             # tradestatus: '1'=正常交易, '0'=停牌
             tradable = status == "1"
             bars.append(
@@ -191,6 +191,7 @@ class BaostockFetcher(BaseFetcher):
                     close=_f(c),
                     volume=_f(vol),
                     amount=_f(amt) if amt else None,
+                    turnover=_f(turn) if turn else None,  # baostock turn=换手率%
                     tradable=tradable,
                     is_st=is_st == "1",
                 )
@@ -313,6 +314,7 @@ def _series_to_dict(series: SecuritySeries) -> dict:
                 "close": b.close,
                 "volume": b.volume,
                 "amount": b.amount,
+                "turnover": b.turnover,
                 "tradable": b.tradable,
                 "is_st": b.is_st,
                 "is_delisted": b.is_delisted,
@@ -339,6 +341,7 @@ def _series_from_dict(obj: dict) -> SecuritySeries:
             close=b["close"],
             volume=b["volume"],
             amount=b.get("amount"),
+            turnover=b.get("turnover"),
             tradable=b.get("tradable", True),
             is_st=b.get("is_st", False),
             is_delisted=b.get("is_delisted", False),

@@ -80,6 +80,7 @@ def back_adjust(
                 close=c,
                 volume=bar.volume,  # 量不复权
                 amount=bar.amount,
+                turnover=bar.turnover,  # 换手率不复权，原样保留
                 tradable=True,
                 is_st=bar.is_st,
                 is_delisted=bar.is_delisted,

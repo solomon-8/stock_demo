@@ -72,11 +72,13 @@ def to_day_bars(
         else:
             price_limit = None
 
-        turnover = (
-            0.0
-            if not b.tradable
-            else indicators.turnover_rate(b.volume, float_shares)
-        )
+        # 优先用数据源直供的当日换手率（如 baostock turn）；缺失时退化为流通股本口径。
+        if not b.tradable:
+            turnover: Optional[float] = 0.0
+        elif b.turnover is not None:
+            turnover = round(b.turnover, 2)
+        else:
+            turnover = indicators.turnover_rate(b.volume, float_shares)
         vol_ratio = 0.0 if not b.tradable else indicators.volume_ratio(volumes, i, 5)
 
         out.append(
