@@ -333,6 +333,71 @@
       ],
       "totalDays": 45,
       "file": "generated_real/level_b0025.json"
+    },
+    {
+      "levelId": "level_d0001",
+      "difficulty": "hard",
+      "outcomeTags": [
+        "delisted",
+        "long-halt",
+        "st"
+      ],
+      "totalDays": 55,
+      "file": "generated_real/level_d0001.json"
+    },
+    {
+      "levelId": "level_d0002",
+      "difficulty": "hard",
+      "outcomeTags": [
+        "delisted",
+        "long-halt"
+      ],
+      "totalDays": 55,
+      "file": "generated_real/level_d0002.json"
+    },
+    {
+      "levelId": "level_d0003",
+      "difficulty": "hard",
+      "outcomeTags": [
+        "delisted",
+        "long-halt",
+        "st"
+      ],
+      "totalDays": 55,
+      "file": "generated_real/level_d0003.json"
+    },
+    {
+      "levelId": "level_d0004",
+      "difficulty": "hard",
+      "outcomeTags": [
+        "delisted",
+        "long-halt",
+        "st"
+      ],
+      "totalDays": 55,
+      "file": "generated_real/level_d0004.json"
+    },
+    {
+      "levelId": "level_d0005",
+      "difficulty": "hard",
+      "outcomeTags": [
+        "delisted",
+        "long-halt",
+        "st"
+      ],
+      "totalDays": 55,
+      "file": "generated_real/level_d0005.json"
+    },
+    {
+      "levelId": "level_d0006",
+      "difficulty": "hard",
+      "outcomeTags": [
+        "delisted",
+        "long-halt",
+        "st"
+      ],
+      "totalDays": 55,
+      "file": "generated_real/level_d0006.json"
     }
   ]
 }

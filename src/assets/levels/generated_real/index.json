@@ -1,230 +1,69 @@
 {
   "levels": [
     {
-      "levelId": "level_b0001",
-      "difficulty": "normal",
-      "outcomeTags": [
-        "crash"
-      ],
-      "totalDays": 59,
-      "file": "generated_real/level_b0001.json"
-    },
-    {
-      "levelId": "level_b0002",
-      "difficulty": "easy",
-      "outcomeTags": [
-        "flat"
-      ],
-      "totalDays": 35,
-      "file": "generated_real/level_b0002.json"
-    },
-    {
-      "levelId": "level_b0003",
-      "difficulty": "normal",
-      "outcomeTags": [
-        "surge"
-      ],
-      "totalDays": 49,
-      "file": "generated_real/level_b0003.json"
-    },
-    {
-      "levelId": "level_b0004",
-      "difficulty": "normal",
-      "outcomeTags": [
-        "crash"
-      ],
-      "totalDays": 36,
-      "file": "generated_real/level_b0004.json"
-    },
-    {
-      "levelId": "level_b0005",
-      "difficulty": "normal",
-      "outcomeTags": [
-        "crash"
-      ],
-      "totalDays": 47,
-      "file": "generated_real/level_b0005.json"
-    },
-    {
-      "levelId": "level_b0006",
-      "difficulty": "easy",
-      "outcomeTags": [
-        "flat"
-      ],
-      "totalDays": 42,
-      "file": "generated_real/level_b0006.json"
-    },
-    {
-      "levelId": "level_b0007",
-      "difficulty": "easy",
-      "outcomeTags": [
-        "flat"
-      ],
-      "totalDays": 30,
-      "file": "generated_real/level_b0007.json"
-    },
-    {
-      "levelId": "level_b0008",
-      "difficulty": "normal",
-      "outcomeTags": [
-        "crash"
-      ],
-      "totalDays": 56,
-      "file": "generated_real/level_b0008.json"
-    },
-    {
-      "levelId": "level_b0009",
-      "difficulty": "normal",
-      "outcomeTags": [
-        "crash"
-      ],
-      "totalDays": 50,
-      "file": "generated_real/level_b0009.json"
-    },
-    {
-      "levelId": "level_b0010",
-      "difficulty": "easy",
-      "outcomeTags": [
-        "flat"
-      ],
-      "totalDays": 60,
-      "file": "generated_real/level_b0010.json"
-    },
-    {
-      "levelId": "level_b0011",
-      "difficulty": "easy",
-      "outcomeTags": [
-        "flat"
-      ],
-      "totalDays": 31,
-      "file": "generated_real/level_b0011.json"
-    },
-    {
-      "levelId": "level_b0012",
-      "difficulty": "normal",
-      "outcomeTags": [
-        "normal-halt"
-      ],
-      "totalDays": 49,
-      "file": "generated_real/level_b0012.json"
-    },
-    {
-      "levelId": "level_b0013",
-      "difficulty": "easy",
-      "outcomeTags": [
-        "flat"
-      ],
-      "totalDays": 35,
-      "file": "generated_real/level_b0013.json"
-    },
-    {
-      "levelId": "level_b0014",
-      "difficulty": "easy",
-      "outcomeTags": [
-        "surge"
-      ],
-      "totalDays": 50,
-      "file": "generated_real/level_b0014.json"
-    },
-    {
-      "levelId": "level_b0015",
-      "difficulty": "normal",
-      "outcomeTags": [
-        "crash"
-      ],
-      "totalDays": 55,
-      "file": "generated_real/level_b0015.json"
-    },
-    {
-      "levelId": "level_b0016",
-      "difficulty": "normal",
-      "outcomeTags": [
-        "normal-halt"
-      ],
-      "totalDays": 36,
-      "file": "generated_real/level_b0016.json"
-    },
-    {
-      "levelId": "level_b0017",
-      "difficulty": "easy",
-      "outcomeTags": [
-        "flat"
-      ],
-      "totalDays": 58,
-      "file": "generated_real/level_b0017.json"
-    },
-    {
-      "levelId": "level_b0018",
+      "levelId": "level_d0001",
       "difficulty": "hard",
       "outcomeTags": [
+        "delisted",
         "long-halt",
-        "crash"
+        "st"
       ],
-      "totalDays": 37,
-      "file": "generated_real/level_b0018.json"
+      "totalDays": 55,
+      "file": "generated_real/level_d0001.json"
     },
     {
-      "levelId": "level_b0019",
-      "difficulty": "easy",
+      "levelId": "level_d0002",
+      "difficulty": "hard",
       "outcomeTags": [
-        "flat"
+        "delisted",
+        "long-halt"
       ],
-      "totalDays": 33,
-      "file": "generated_real/level_b0019.json"
+      "totalDays": 55,
+      "file": "generated_real/level_d0002.json"
     },
     {
-      "levelId": "level_b0020",
-      "difficulty": "easy",
+      "levelId": "level_d0003",
+      "difficulty": "hard",
       "outcomeTags": [
-        "surge"
+        "delisted",
+        "long-halt",
+        "st"
       ],
-      "totalDays": 31,
-      "file": "generated_real/level_b0020.json"
+      "totalDays": 55,
+      "file": "generated_real/level_d0003.json"
     },
     {
-      "levelId": "level_b0021",
-      "difficulty": "normal",
+      "levelId": "level_d0004",
+      "difficulty": "hard",
       "outcomeTags": [
-        "crash"
+        "delisted",
+        "long-halt",
+        "st"
       ],
-      "totalDays": 35,
-      "file": "generated_real/level_b0021.json"
+      "totalDays": 55,
+      "file": "generated_real/level_d0004.json"
     },
     {
-      "levelId": "level_b0022",
-      "difficulty": "normal",
+      "levelId": "level_d0005",
+      "difficulty": "hard",
       "outcomeTags": [
-        "crash"
+        "delisted",
+        "long-halt",
+        "st"
       ],
-      "totalDays": 58,
-      "file": "generated_real/level_b0022.json"
+      "totalDays": 55,
+      "file": "generated_real/level_d0005.json"
     },
     {
-      "levelId": "level_b0023",
-      "difficulty": "normal",
+      "levelId": "level_d0006",
+      "difficulty": "hard",
       "outcomeTags": [
-        "crash"
+        "delisted",
+        "long-halt",
+        "st"
       ],
-      "totalDays": 44,
-      "file": "generated_real/level_b0023.json"
-    },
-    {
-      "levelId": "level_b0024",
-      "difficulty": "easy",
-      "outcomeTags": [
-        "flat"
-      ],
-      "totalDays": 37,
-      "file": "generated_real/level_b0024.json"
-    },
-    {
-      "levelId": "level_b0025",
-      "difficulty": "normal",
-      "outcomeTags": [
-        "crash"
-      ],
-      "totalDays": 45,
-      "file": "generated_real/level_b0025.json"
+      "totalDays": 55,
+      "file": "generated_real/level_d0006.json"
     }
   ]
 }

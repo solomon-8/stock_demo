@@ -73,6 +73,12 @@ import generated_real_level_b0022_json from '../assets/levels/generated_real/lev
 import generated_real_level_b0023_json from '../assets/levels/generated_real/level_b0023.json'
 import generated_real_level_b0024_json from '../assets/levels/generated_real/level_b0024.json'
 import generated_real_level_b0025_json from '../assets/levels/generated_real/level_b0025.json'
+import generated_real_level_d0001_json from '../assets/levels/generated_real/level_d0001.json'
+import generated_real_level_d0002_json from '../assets/levels/generated_real/level_d0002.json'
+import generated_real_level_d0003_json from '../assets/levels/generated_real/level_d0003.json'
+import generated_real_level_d0004_json from '../assets/levels/generated_real/level_d0004.json'
+import generated_real_level_d0005_json from '../assets/levels/generated_real/level_d0005.json'
+import generated_real_level_d0006_json from '../assets/levels/generated_real/level_d0006.json'
 
 /**
  * 关卡文件注册表：file 名 -> 原始 JSON 模块。
@@ -116,6 +122,12 @@ const LEVEL_MODULES: Record<string, unknown> = {
   'generated_real/level_b0023.json': generated_real_level_b0023_json,
   'generated_real/level_b0024.json': generated_real_level_b0024_json,
   'generated_real/level_b0025.json': generated_real_level_b0025_json,
+  'generated_real/level_d0001.json': generated_real_level_d0001_json,
+  'generated_real/level_d0002.json': generated_real_level_d0002_json,
+  'generated_real/level_d0003.json': generated_real_level_d0003_json,
+  'generated_real/level_d0004.json': generated_real_level_d0004_json,
+  'generated_real/level_d0005.json': generated_real_level_d0005_json,
+  'generated_real/level_d0006.json': generated_real_level_d0006_json,
 }
 // <<< LEVELS:GENERATED:END
 
