@@ -30,7 +30,9 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        run: npm ci
+        # vitest 引入 vite@5，而 @tarojs/plugin-framework-react@4.0.9 的 peer 要求 vite@4，
+        # 二者仅为 peerOptional 冲突，用 legacy-peer-deps 放行（与本地安装策略一致）。
+        run: npm ci --legacy-peer-deps
 
       - name: Build H5
         run: npm run build:h5
