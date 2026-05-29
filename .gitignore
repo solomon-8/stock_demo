@@ -11,3 +11,5 @@ data/raw/
 # 全市场量产关卡：体量大(数十MB)、可由 pipeline.build_market 复现，不入库；运行时按需 fetch。
 src/assets/levels/market/*
 !src/assets/levels/market/.gitkeep
+# Added by CADK
+.claude/skills/
