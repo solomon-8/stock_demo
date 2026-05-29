@@ -42,6 +42,8 @@ export interface GameView {
   today?: DayBar
   /** 当日成交参考价（收盘价）。 */
   price: number
+  /** 当前持仓的平均成本价（移动加权；无持仓为 0）。 */
+  avgCost: number
   /** 当日涨跌幅（相对前一交易日收盘，小数）。首日为 undefined。 */
   changePct?: number
   /** 当日是否可交易（停牌为 false）。 */
@@ -81,6 +83,29 @@ export interface UseGameResult {
 /** 取某日的 close 价（越界为 0）。 */
 function closeAt(level: LevelPack, day: number): number {
   return level.days[day]?.close ?? 0
+}
+
+/**
+ * 由交易历史（仅含 buy/sell）按移动加权法计算当前持仓的平均成本价。
+ * - 买入：加权并入；卖出：按当前均价摊出（不影响剩余持仓成本）。
+ * - 无持仓返回 0。
+ */
+function computeAvgCost(state: GameState): number {
+  let shares = 0
+  let totalCost = 0
+  for (const h of state.history) {
+    if (h.action === 'buy') {
+      const qty = h.shares - shares
+      if (qty > 0) totalCost += qty * h.price
+      shares = h.shares
+    } else if (h.action === 'sell') {
+      const qty = shares - h.shares
+      const avg = shares > 0 ? totalCost / shares : 0
+      totalCost -= qty * avg
+      shares = h.shares
+    }
+  }
+  return shares > 0 ? totalCost / shares : 0
 }
 
 /**
@@ -161,6 +186,7 @@ export function useGame(): UseGameResult {
       revealedDays: level.days.slice(0, day + 1),
       today,
       price,
+      avgCost: computeAvgCost(state),
       changePct,
       tradable: today?.tradable !== false,
       // 剩余天数（含当日）：末日时为 1。

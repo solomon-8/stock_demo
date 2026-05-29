@@ -75,7 +75,8 @@ def run(args: argparse.Namespace) -> int:
         story = DELIST_STORIES[i % len(DELIST_STORIES)]
         try:
             pack, difficulty = level_builder.build_level(
-                adjusted, level_id, start_index=start, length=L, story=story
+                adjusted, level_id, start_index=start, length=L, story=story,
+                expose_identity=True,
             )
         except Exception as exc:  # noqa: BLE001
             print(f"[skip] 切关卡失败 {code}: {exc}", file=sys.stderr)

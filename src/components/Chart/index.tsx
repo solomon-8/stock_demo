@@ -175,8 +175,10 @@ export interface ChartProps {
   showMACD?: boolean
   /** 是否显示 RSI 副图。默认 false。 */
   showRSI?: boolean
-  /** 容器高度（px）。默认 420。 */
+  /** 容器高度（px）。默认 420。fill=true 时忽略，改为填满父容器。 */
   height?: number
+  /** 填充模式：图表高度填满父容器（父需为有确定高度的 flex 项）。 */
+  fill?: boolean
 }
 
 /** 自定义停牌蒙层指标名（叠加在主图，不产生数值）。 */
@@ -258,6 +260,7 @@ export default function Chart(props: ChartProps) {
     showMACD = true,
     showRSI = false,
     height = 420,
+    fill = false,
   } = props
 
   const containerRef = useRef<HTMLDivElement | null>(null)
@@ -287,7 +290,15 @@ export default function Chart(props: ChartProps) {
     chartRef.current = chart
     renderedLenRef.current = 0
 
+    // 填充模式：容器高度由 flex 决定，需在尺寸变化时手动 resize 画布。
+    let ro: ResizeObserver | undefined
+    if (typeof ResizeObserver !== 'undefined') {
+      ro = new ResizeObserver(() => chartRef.current?.resize?.())
+      ro.observe(el)
+    }
+
     return () => {
+      ro?.disconnect()
       if (chartRef.current) {
         dispose(el)
         chartRef.current = null
@@ -375,7 +386,7 @@ export default function Chart(props: ChartProps) {
   }, [days])
 
   return (
-    <View className="kline-shell">
+    <View className={fill ? 'kline-shell kline-shell--fill' : 'kline-shell'}>
       {/* 终端风标题条：行情标识 + 脱敏提示，融入深色盘面 */}
       <View className="kline-shell__bar">
         <View className="kline-shell__brand">
@@ -386,7 +397,7 @@ export default function Chart(props: ChartProps) {
       </View>
       <View
         className="kline-chart"
-        style={{ width: '100%', height: `${height}px` }}
+        style={fill ? { width: '100%', flex: 1 } : { width: '100%', height: `${height}px` }}
         ref={containerRef as unknown as React.Ref<any>}
       />
     </View>

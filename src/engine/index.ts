@@ -434,10 +434,8 @@ export function settle(state: GameState, level: LevelPack): SettleResult {
     roi,
     grade,
     buyHoldRoi,
-    reveal: {
-      outcomeTags: level.reveal.outcomeTags,
-      story: level.reveal.story,
-    },
+    // 透传完整揭盘数据（含真实数据关卡的 realName/period/market）
+    reveal: { ...level.reveal },
   }
 }
 

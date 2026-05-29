@@ -114,6 +114,30 @@
   color: var(--t2);
 }
 
+/* 持仓成本 / 浮动盈亏行（仅持仓时显示） */
+.trade-panel__holding {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--s3);
+  padding-top: var(--s3);
+  border-top: 1px solid var(--border);
+}
+
+.trade-panel__holding-item {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s2);
+}
+
+.trade-panel__pnl--up {
+  color: var(--up);
+}
+
+.trade-panel__pnl--down {
+  color: var(--down);
+}
+
 .trade-panel__progress {
   display: flex;
   justify-content: flex-end;
@@ -278,7 +302,13 @@
   transform: scale(0.98);
 }
 
-.trade-panel__btn[disabled] {
+/* 去掉 Taro H5 Button 默认的 ::after 1px 边框杂边 */
+.trade-panel__btn::after {
+  border: none;
+}
+
+/* 仅在“真正禁用”时变暗：用 [disabled="true"] 规避 Taro 把 disabled="false" 也渲染成属性的坑 */
+.trade-panel__btn[disabled="true"] {
   opacity: 0.4;
   box-shadow: none;
 }

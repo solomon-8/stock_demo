@@ -58,7 +58,9 @@ def run(args: argparse.Namespace) -> int:
 
         level_id = f"level_b{str(i + 1).zfill(4)}"
         try:
-            pack, difficulty = level_builder.build_level(adjusted, level_id, rng=rng)
+            pack, difficulty = level_builder.build_level(
+                adjusted, level_id, rng=rng, expose_identity=not args.mock
+            )
         except Exception as exc:  # noqa: BLE001
             print(f"[skip] 切关卡失败 {code}: {exc}", file=sys.stderr)
             continue

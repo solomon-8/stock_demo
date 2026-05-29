@@ -25,6 +25,8 @@ export interface TradePanelProps {
   shares: number
   /** 当日价（成交参考价：收盘价，或复牌后开盘价） */
   price: number
+  /** 当前持仓的平均成本价（移动加权）；无持仓时可不传 / 传 0 */
+  avgCost?: number
   /** 当日是否可交易；停牌为 false（禁用买/卖） */
   tradable: boolean
   /** 当日涨跌幅（小数，如 0.03 表示 +3%）。用于展示，可选 */
@@ -77,6 +79,7 @@ export default function TradePanel(props: TradePanelProps) {
     cash,
     shares,
     price,
+    avgCost = 0,
     tradable,
     changePct,
     daysLeft,
@@ -98,6 +101,13 @@ export default function TradePanel(props: TradePanelProps) {
   // 派生展示值（纯计算，不可变）
   const positionValue = shares * price
   const totalAssets = cash + positionValue
+
+  // 持仓成本与浮动盈亏（仅持仓时有意义；红涨绿跌）
+  const holding = shares > 0 && avgCost > 0
+  const floatPnlPct = holding ? price / avgCost - 1 : 0
+  const floatPnl = holding ? (price - avgCost) * shares : 0
+  const pnlUp = floatPnl > 0
+  const pnlDown = floatPnl < 0
 
   // 当日涨跌方向 → 胶囊 / 总资产数字配色
   const upDay = changePct !== undefined && changePct > 0
@@ -161,6 +171,30 @@ export default function TradePanel(props: TradePanelProps) {
             <Text className="trade-panel__stat-val num">{formatMoney(price)}</Text>
           </View>
         </View>
+
+        {holding && (
+          <View className="trade-panel__holding">
+            <View className="trade-panel__holding-item">
+              <Text className="trade-panel__stat-label">持仓成本</Text>
+              <Text className="trade-panel__stat-val num">{formatMoney(avgCost)}</Text>
+            </View>
+            <View className="trade-panel__holding-item trade-panel__holding-item--end">
+              <Text className="trade-panel__stat-label">浮动盈亏</Text>
+              <Text
+                className={
+                  pnlUp
+                    ? 'trade-panel__stat-val trade-panel__pnl--up num'
+                    : pnlDown
+                      ? 'trade-panel__stat-val trade-panel__pnl--down num'
+                      : 'trade-panel__stat-val num'
+                }
+              >
+                {pnlUp ? '+' : ''}
+                {formatMoney(floatPnl)} ({formatPct(floatPnlPct)})
+              </Text>
+            </View>
+          </View>
+        )}
 
         <View className="trade-panel__progress">
           <Text className="trade-panel__progress-text num">
@@ -233,7 +267,7 @@ export default function TradePanel(props: TradePanelProps) {
                 <Button
                   key={`${side}-${r}`}
                   className={cls}
-                  disabled={!canAct}
+                  disabled={!canAct || undefined}
                   onClick={() => setPct(r)}
                 >
                   {r}%
@@ -269,7 +303,7 @@ export default function TradePanel(props: TradePanelProps) {
           {isBuy ? (
             <Button
               className="trade-panel__btn trade-panel__btn--buy"
-              disabled={!canBuy || buyPct <= 0}
+              disabled={!canBuy || buyPct <= 0 || undefined}
               onClick={() => onBuy(buyPct / 100)}
             >
               买入 +{formatInt(estBuyShares)} 股
@@ -277,7 +311,7 @@ export default function TradePanel(props: TradePanelProps) {
           ) : (
             <Button
               className="trade-panel__btn trade-panel__btn--sell"
-              disabled={!canSell || sellPct <= 0}
+              disabled={!canSell || sellPct <= 0 || undefined}
               onClick={() => onSell(sellPct / 100)}
             >
               卖出 -{formatInt(estSellShares)} 股
@@ -290,14 +324,14 @@ export default function TradePanel(props: TradePanelProps) {
       <View className="trade-panel__actions">
         <Button
           className="trade-panel__btn trade-panel__btn--hold"
-          disabled={finished}
+          disabled={finished || undefined}
           onClick={onHold}
         >
           持有 →
         </Button>
         <Button
           className="trade-panel__btn trade-panel__btn--advance"
-          disabled={finished}
+          disabled={finished || undefined}
           onClick={onAdvance}
         >
           下一日 ⏭

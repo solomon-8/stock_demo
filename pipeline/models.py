@@ -102,6 +102,10 @@ class MarketEvent:
 class Reveal:
     outcomeTags: List[str]
     story: str
+    # 真实身份字段：仅真实数据关卡有，仅供结算复盘揭盘，绝不在游戏过程暴露。
+    realName: Optional[str] = None
+    period: Optional[str] = None
+    market: Optional[str] = None
 
 
 @dataclass

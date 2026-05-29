@@ -104,5 +104,11 @@ export interface SettleResult {
   reveal: {
     outcomeTags: string[]
     story: string
+    /** 真实股票名称（仅真实数据关卡有） */
+    realName?: string
+    /** 真实时间区间标签（仅真实数据关卡有） */
+    period?: string
+    /** 市场标签（仅真实数据关卡有） */
+    market?: string
   }
 }

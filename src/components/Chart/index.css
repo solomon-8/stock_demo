@@ -18,6 +18,19 @@
   box-shadow: var(--shadow-card);
 }
 
+/* 填充模式：外壳纵向 flex，靠父级 align-items:stretch 拉满高度（不用 height:100%，
+   因父级在 min-height 布局下非确定高度，% 会塌成 auto）。画布占据除标题条外的全部高度。 */
+.kline-shell--fill {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.kline-shell--fill .kline-chart {
+  flex: 1;
+  min-height: 240px;
+}
+
 /* 标题条：行情标识 + 脱敏日序，底部一条令牌细分隔线 */
 .kline-shell__bar {
   display: flex;

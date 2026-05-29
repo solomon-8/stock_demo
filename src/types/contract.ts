@@ -85,12 +85,18 @@ export interface LevelPack {
   days: DayBar[]
   /** 市场事件列表（用于结局揭盘） */
   events: MarketEvent[]
-  /** 结局揭盘数据 */
+  /** 结局揭盘数据（仅在结算复盘时展示，游戏过程中绝不暴露） */
   reveal: {
     /** 结局类型标签，如 ['surge'] / ['delisted'] / ['st','crash'] */
     outcomeTags: string[]
     /** 结局揭盘文案（可含真实代号，但不在游戏过程中暴露） */
     story: string
+    /** 真实股票名称（仅真实数据关卡有；合成关卡为空）。复盘揭盘用。 */
+    realName?: string
+    /** 真实时间区间标签，如 '2020-03-15 ~ 2020-05-20'（仅真实数据关卡有）。 */
+    period?: string
+    /** 市场标签，如 'A股 · 上证' / 'A股 · 深证'（仅真实数据关卡有）。 */
+    market?: string
   }
 }
 

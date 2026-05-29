@@ -157,6 +157,18 @@ def pick_window(
 # ----------------------------------------------------------------- 组装
 
 
+def _market_label(code: str) -> Optional[str]:
+    """由 baostock 代码前缀推断市场标签（仅用于真实数据复盘揭盘）。"""
+    c = (code or "").lower()
+    if c.startswith("sh."):
+        return "A股 · 沪市"
+    if c.startswith("sz."):
+        return "A股 · 深市"
+    if c.startswith("bj."):
+        return "A股 · 北交所"
+    return "A股"
+
+
 def build_level(
     series: SecuritySeries,
     level_id: str,
@@ -165,8 +177,13 @@ def build_level(
     start_index: Optional[int] = None,
     length: Optional[int] = None,
     story: Optional[str] = None,
+    expose_identity: bool = False,
 ) -> Tuple[LevelPack, str]:
-    """从一只股票的（复权后）序列切一关，返回 (LevelPack, difficulty)。"""
+    """从一只股票的（复权后）序列切一关，返回 (LevelPack, difficulty)。
+
+    expose_identity=True 时（仅真实数据），把真实名称/真实时间区间/市场写入 reveal，
+    供【结算复盘】揭盘——游戏过程仍只读脱敏 DayBar，绝不暴露身份。mock/合成关卡保持全匿名。
+    """
     rng = rng or random.Random(0)
     start, L = pick_window(series.bars, rng, start_index=start_index, length=length)
     window: List[RawBar] = list(series.bars[start : start + L])
@@ -181,6 +198,13 @@ def build_level(
     if story is None:
         story = build_story(tags, window, events, series.meta)
 
+    reveal = Reveal(outcomeTags=tags, story=story)
+    if expose_identity:
+        reveal.realName = series.meta.name or None
+        if window and window[0].date and window[-1].date:
+            reveal.period = f"{window[0].date} ~ {window[-1].date}"
+        reveal.market = _market_label(series.meta.code)
+
     pack = LevelPack(
         levelId=level_id,
         totalDays=L,
@@ -188,7 +212,7 @@ def build_level(
         startCash=START_CASH,
         days=day_bars,
         events=events,
-        reveal=Reveal(outcomeTags=tags, story=story),
+        reveal=reveal,
     )
     return pack, difficulty
 

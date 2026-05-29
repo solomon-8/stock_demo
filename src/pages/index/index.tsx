@@ -78,17 +78,26 @@ export default function Index() {
     )
   }
 
-  // 进行中 → K 线 + 交易面板
+  // 进行中 → K 线 + 交易面板（弹性布局：高屏图表填满，矮屏整页可滚动）
   return (
-    <ScrollView scrollY className="index-page index-page--play">
+    <View className="index-page index-page--play">
       <View className="index-page__chart">
-        <Chart days={view.revealedDays} height={360} />
+        {/* 主图 K线+MA + 成交量；MACD/RSI 在 30~60 日短局里前期全空、徒占版面，默认隐藏 */}
+        <Chart
+          days={view.revealedDays}
+          fill
+          showMA
+          showVOL
+          showMACD={false}
+          showRSI={false}
+        />
       </View>
       <View className="index-page__panel">
         <TradePanel
           cash={state.cash}
           shares={state.shares}
           price={view.price}
+          avgCost={view.avgCost}
           tradable={view.tradable}
           changePct={view.changePct}
           daysLeft={view.daysLeft}
@@ -102,6 +111,6 @@ export default function Index() {
           onSkipToResume={() => dispatch({ type: 'skipToResume' })}
         />
       </View>
-    </ScrollView>
+    </View>
   )
 }

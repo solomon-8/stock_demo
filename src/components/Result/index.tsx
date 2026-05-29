@@ -211,6 +211,20 @@ export default function Result(props: ResultProps) {
       {/* 事后揭盘：这只股票其实…… */}
       <View className="result__card">
         <Text className="result__card-title">复盘 · 这只股票其实……</Text>
+        {/* 真相揭晓：真实关卡亮出名称 + 市场 + 时间段（仅复盘可见，游戏过程严格脱敏） */}
+        {reveal.realName ? (
+          <View className="result__identity">
+            <Text className="result__identity-name">{reveal.realName}</Text>
+            <Text className="result__identity-meta num">
+              {reveal.market ?? 'A股'}
+              {reveal.period ? `  ·  ${reveal.period}` : ''}
+            </Text>
+          </View>
+        ) : (
+          <Text className="result__identity-synthetic">
+            🎲 合成行情关卡（非真实个股，专为练手而生）
+          </Text>
+        )}
         {reveal.outcomeTags?.length ? (
           <View className="result__tags">
             {reveal.outcomeTags.map((tag) => (

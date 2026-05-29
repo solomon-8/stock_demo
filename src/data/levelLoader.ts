@@ -404,6 +404,12 @@ function validateLevelPack(raw: unknown, entry?: LevelIndexEntry): LevelPack {
   if (typeof reveal.story !== 'string') {
     fail('LEVEL_INVALID', 'reveal.story 缺失或非字符串', levelId)
   }
+  // 可选揭盘身份字段（仅真实数据关卡有）：若存在须为字符串。
+  for (const key of ['realName', 'period', 'market'] as const) {
+    if (reveal[key] !== undefined && typeof reveal[key] !== 'string') {
+      fail('LEVEL_INVALID', `reveal.${key} 存在但非字符串`, levelId)
+    }
+  }
 
   // 与索引条目交叉校验（若提供）
   if (entry) {
@@ -433,6 +439,9 @@ function validateLevelPack(raw: unknown, entry?: LevelIndexEntry): LevelPack {
     reveal: {
       outcomeTags: (reveal.outcomeTags as string[]).slice(),
       story: reveal.story as string,
+      ...(typeof reveal.realName === 'string' ? { realName: reveal.realName } : {}),
+      ...(typeof reveal.period === 'string' ? { period: reveal.period } : {}),
+      ...(typeof reveal.market === 'string' ? { market: reveal.market } : {}),
     },
   }
 }
