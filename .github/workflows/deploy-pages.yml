@@ -28,15 +28,18 @@ jobs:
         with:
           node-version: 20
 
-      # 旧版 npm 在该依赖树上偶发 "Exit handler never called!" 崩溃并残留半装的
-      # node_modules（导致 taro 命令缺失），升级到最新 npm 规避该 bug。
-      - name: Upgrade npm
-        run: npm install -g npm@latest
+      # package-lock.json 的 resolved URL 指向 ByteDance 内网镜像 bnpm.byted.org，
+      # GitHub runner 无法访问。该镜像是公网 npm 的镜像（tarball 路径与 integrity 一致），
+      # 故将锁文件中的主机改写为公网 registry，再用 npm ci 保持确定性安装。
+      - name: Repoint lockfile to public npm registry
+        run: |
+          sed -i 's#https://bnpm.byted.org#https://registry.npmjs.org#g' package-lock.json
+          npm config set registry https://registry.npmjs.org/
 
       - name: Install dependencies
         # vitest 引入 vite@5，而 @tarojs/plugin-framework-react@4.0.9 的 peer 要求 vite@4，
         # 二者仅为 peerOptional 冲突，用 legacy-peer-deps 放行（与本地安装策略一致）。
-        run: npm install --legacy-peer-deps --no-audit --no-fund
+        run: npm ci --legacy-peer-deps --no-audit --no-fund
 
       - name: Build H5
         run: npm run build:h5
