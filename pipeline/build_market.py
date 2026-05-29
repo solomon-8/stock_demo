@@ -19,6 +19,7 @@ from __future__ import annotations
 import argparse
 import os
 import random
+import socket
 import sys
 import time
 from typing import List, Optional, Tuple
@@ -49,26 +50,69 @@ def discover_codes(bs, day: str) -> List[Tuple[str, str]]:
     return a
 
 
+def scan_index(levels_dir: str, out_subdir: str) -> List[LevelIndexEntry]:
+    """扫描 market 目录下已生成的关卡文件，构建索引条目列表。"""
+    import json
+
+    out_dir = os.path.join(levels_dir, out_subdir)
+    entries: List[LevelIndexEntry] = []
+    for name in sorted(os.listdir(out_dir)):
+        if not (name.startswith("level_m") and name.endswith(".json")):
+            continue
+        try:
+            d = json.load(open(os.path.join(out_dir, name), encoding="utf-8"))
+            entries.append(
+                LevelIndexEntry(
+                    levelId=d["levelId"],
+                    difficulty=_difficulty_from_tags(d["reveal"]["outcomeTags"]),
+                    outcomeTags=d["reveal"]["outcomeTags"],
+                    totalDays=d["totalDays"],
+                    file=os.path.join(out_subdir, name),
+                )
+            )
+        except Exception:
+            continue
+    return entries
+
+
 def run(args: argparse.Namespace) -> int:
     out_subdir = args.out_subdir
     out_dir = os.path.join(args.levels_dir, out_subdir)
     os.makedirs(out_dir, exist_ok=True)
 
+    # 关键：给所有 socket 设默认读超时，避免 baostock 连接僵死导致整个进程无限挂起。
+    # 任何 fetch 卡超过该秒数即抛 socket.timeout → 被 _retry/异常捕获 → 跳过该股、继续。
+    socket.setdefaulttimeout(args.fetch_timeout)
+
+    # 仅重建索引（并行 worker 跑完后统一扫描生成，避免多进程写索引互相覆盖）。
+    if args.index_only:
+        entries = scan_index(args.levels_dir, out_subdir)
+        exporter.write_index(entries, args.levels_dir, out_subdir)
+        print(f"[market] 重建索引：{len(entries)} 关", flush=True)
+        return 0
+
     fetcher = BaostockFetcher(cache_dir=args.cache_dir, min_interval=args.min_interval)
     bs = fetcher._ensure_login()
 
-    codes = discover_codes(bs, args.day)
+    all_codes = discover_codes(bs, args.day)
     if args.limit and args.limit > 0:
-        codes = codes[: args.limit]
+        all_codes = all_codes[: args.limit]
+    # 分片并行：按全局位次取模，level_id 用【全局位次】保证多 worker 间稳定且不冲突。
+    indexed = list(enumerate(all_codes))
+    codes = [(g, c) for g, c in indexed if g % args.shard_count == args.shard_index]
     total = len(codes)
-    print(f"[market] 全市场 A 股个股: {total} 只（输出 -> {out_dir}）", flush=True)
+    print(
+        f"[market] shard {args.shard_index}/{args.shard_count}: "
+        f"{total} 只（全市场 {len(all_codes)}，输出 -> {out_dir}）",
+        flush=True,
+    )
 
     entries: List[LevelIndexEntry] = []
     ok = skip = fail = 0
     t0 = time.time()
 
-    for seq, (code, _name) in enumerate(codes):
-        level_id = f"level_m{seq:05d}"  # 稳定序号，不含真实代码
+    for seq, (code, _name) in codes:
+        level_id = f"level_m{seq:05d}"  # 全局稳定序号，不含真实代码
         file_ref = os.path.join(out_subdir, f"{level_id}.json")
         full_path = os.path.join(args.levels_dir, file_ref)
 
@@ -128,15 +172,18 @@ def run(args: argparse.Namespace) -> int:
         ok += 1
 
         if (ok + skip) % args.flush_every == 0:
-            exporter.write_index(entries, args.levels_dir, out_subdir)
+            # 多 worker 并行时不各自写索引（会互相覆盖）；跑完用 --index-only 统一生成。
+            if args.shard_count == 1:
+                exporter.write_index(entries, args.levels_dir, out_subdir)
             rate = (ok) / max(time.time() - t0, 1e-6)
             print(
-                f"[market] 进度 {seq + 1}/{total}  新建 {ok} 跳过 {skip} 失败 {fail}  "
+                f"[market] shard {args.shard_index}: 新建 {ok} 跳过 {skip} 失败 {fail}  "
                 f"~{rate:.1f} 关/s",
                 flush=True,
             )
 
-    exporter.write_index(entries, args.levels_dir, out_subdir)
+    if args.shard_count == 1:
+        exporter.write_index(entries, args.levels_dir, out_subdir)
     fetcher.close()
     print(
         f"[market] 完成：索引 {len(entries)} 关（新建 {ok} / 跳过 {skip} / 失败 {fail}），"
@@ -166,6 +213,10 @@ def build_arg_parser() -> argparse.ArgumentParser:
     p.add_argument("--cache-dir", default="/tmp/bs_market_cache")
     p.add_argument("--min-interval", type=float, default=0.15, help="限流：两次请求最小间隔秒")
     p.add_argument("--flush-every", type=int, default=50, help="每 N 关刷新一次索引并打印进度")
+    p.add_argument("--shard-index", type=int, default=0, help="分片序号(0-based)，并行用")
+    p.add_argument("--shard-count", type=int, default=1, help="分片总数，并行 worker 数")
+    p.add_argument("--index-only", action="store_true", help="仅扫描已生成关卡重建索引(不抓取)")
+    p.add_argument("--fetch-timeout", type=float, default=30.0, help="单次请求 socket 读超时秒(防僵死)")
     return p
 
 
