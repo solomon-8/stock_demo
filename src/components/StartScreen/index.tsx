@@ -132,6 +132,14 @@ export default function StartScreen({ stats, onStart }: StartScreenProps) {
           <Text className="home__more" onClick={() => setSheetOpen(true)}>
             查看完整玩法 ›
           </Text>
+
+          {/* 教育意图：玩前点题——仅凭 K 线交易长期难赢。 */}
+          <View className="home__edu">
+            <Text className="home__edu-lead">只看 K 线，赢的是运气，输的是趋势</Text>
+            <Text className="home__edu-body">
+              脱离基本面、只盯图形猜涨跌，长期大概率是亏的。本游戏就想让你亲手体验这一点——看清它，比赢这一局更值钱。
+            </Text>
+          </View>
         </View>
       </View>
 

@@ -268,6 +268,33 @@
   padding: var(--s2) var(--s3);
 }
 
+/* 教育点题区：玩前一句话，弱化但醒目，左侧金色细条强调 */
+.home__edu {
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: var(--s4);
+  padding: var(--s3) var(--s4);
+  border-left: 3px solid var(--gold);
+  border-radius: var(--r-sm);
+  background: rgba(28, 34, 48, 0.5);
+}
+
+.home__edu-lead {
+  display: block;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 0.02em;
+}
+
+.home__edu-body {
+  display: block;
+  margin-top: var(--s2);
+  font-size: 20px;
+  line-height: 1.7;
+  color: var(--t3);
+}
+
 /* ── 玩法说明底部 sheet ── */
 .home__overlay {
   position: fixed;
