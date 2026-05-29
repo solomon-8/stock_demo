@@ -131,6 +131,29 @@ const LEVEL_MODULES: Record<string, unknown> = {
 }
 // <<< LEVELS:GENERATED:END
 
+// ---- 全市场关卡：运行时懒加载 --------------------------------------------
+// 提交进仓库的基础关卡（上方注册表）随 bundle 静态打包、永远可用；
+// 全市场量产关卡（market/，体量大、gitignore）则在运行时按需 fetch：
+//   - loadIndex 额外尝试 fetch market/index.json，存在则并入候选；不存在/失败则忽略。
+//   - loadLevel 命中注册表走内存，否则 fetch 关卡文件。
+// 这样：bundle 体积只与基础关卡有关；全新 clone 无 market 数据也能正常玩基础关卡。
+
+/** 关卡静态资源的运行时基址（Taro H5 把 src/assets/levels 拷到 dist/levels）。 */
+const LEVELS_BASE = 'levels/'
+
+/** fetch 一个 JSON 资源；非 2xx 或解析失败抛错（由调用方决定吞掉与否）。 */
+async function fetchJson(url: string): Promise<unknown> {
+  if (typeof fetch !== 'function') {
+    throw new Error('当前环境无 fetch，无法加载远程关卡')
+  }
+  const res = await fetch(url)
+  if (!res.ok) throw new Error(`HTTP ${res.status} @ ${url}`)
+  return res.json()
+}
+
+/** 合并后的索引缓存（基础关卡 + 可选 market 关卡），避免每次重复 fetch。 */
+let mergedIndexCache: LevelIndex | undefined
+
 // ---- 错误类型 ------------------------------------------------------------
 
 /** 加载错误码，便于调用方区分处理（统一为「跳过换关」即可）。 */
@@ -449,11 +472,31 @@ function validateLevelPack(raw: unknown, entry?: LevelIndexEntry): LevelPack {
 // ---- 公共 API ------------------------------------------------------------
 
 /**
- * 加载并校验关卡索引（index.json）。
- * @throws LevelLoadError('INDEX_INVALID') 索引结构非法
+ * 加载并校验关卡索引。
+ * = 打包的基础关卡索引 + （若可用）运行时 fetch 的 market/index.json。
+ * market 索引拉取失败（无数据 / 离线 / node 测试环境）时静默忽略，仅返回基础关卡。
+ * @throws LevelLoadError('INDEX_INVALID') 基础索引结构非法
  */
 export async function loadIndex(): Promise<LevelIndex> {
-  return validateIndex(levelIndexJson)
+  if (mergedIndexCache) return mergedIndexCache
+
+  const base = validateIndex(levelIndexJson)
+  const levels: LevelIndexEntry[] = [...base.levels]
+
+  // 尝试并入全市场关卡索引（存在才并入；任何失败都安全忽略）。
+  try {
+    const raw = await fetchJson(`${LEVELS_BASE}market/index.json`)
+    const market = validateIndex(raw)
+    const seen = new Set(levels.map((e) => e.levelId))
+    for (const e of market.levels) {
+      if (!seen.has(e.levelId)) levels.push(e)
+    }
+  } catch {
+    // 无 market 数据 / 离线 / 非浏览器环境：仅用基础关卡。
+  }
+
+  mergedIndexCache = { levels }
+  return mergedIndexCache
 }
 
 /**
@@ -474,12 +517,24 @@ export async function loadLevel(ref: string): Promise<LevelPack> {
   // 解析 file 名：优先用索引条目的 file，否则把 ref 当作 file（兼容直接传文件名）
   const file = entry?.file ?? (ref.endsWith('.json') ? ref : `${ref}.json`)
 
+  // 基础关卡命中注册表 → 走内存（零网络、离线可用）。
   const mod = LEVEL_MODULES[file]
-  if (mod === undefined) {
-    fail('LEVEL_NOT_FOUND', `未找到关卡资源: ${ref} (file=${file})`, ref)
+  if (mod !== undefined) {
+    return validateLevelPack(mod, entry)
   }
 
-  return validateLevelPack(mod, entry)
+  // 否则视为全市场量产关卡 → 运行时 fetch 关卡文件。
+  let raw: unknown
+  try {
+    raw = await fetchJson(`${LEVELS_BASE}${file}`)
+  } catch (err) {
+    fail(
+      'LEVEL_NOT_FOUND',
+      `未找到关卡资源: ${ref} (file=${file}; ${err instanceof Error ? err.message : String(err)})`,
+      ref,
+    )
+  }
+  return validateLevelPack(raw, entry)
 }
 
 /** pickRandomLevel 的过滤 / 随机选项。 */

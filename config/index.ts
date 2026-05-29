@@ -18,7 +18,11 @@ export default defineConfig<'webpack5'>(async (merge) => {
     plugins: [],
     defineConstants: {},
     copy: {
-      patterns: [],
+      // 全市场量产关卡（gitignore、运行时 fetch）原样拷到 dist/levels/market 供前端按需加载。
+      // 目录由 market/.gitkeep 保证恒存在（全新 clone 也不报错，仅基础关卡可玩）。
+      patterns: [
+        { from: 'src/assets/levels/market', to: 'dist/levels/market' },
+      ],
       options: {},
     },
     framework: 'react',
