@@ -1,6 +1,7 @@
 .index-page {
   min-height: 100vh;
   box-sizing: border-box;
+  background: var(--bg-base);
 }
 
 /* 居中态：加载 / 错误 */
@@ -9,27 +10,27 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 48px 24px;
+  padding: var(--s7) var(--s5);
   text-align: center;
+  background: var(--bg-void);
 }
 
 /* 游戏进行中：单列纵向，移动优先 */
 .index-page--play {
   display: block;
-  padding: 8px 8px 24px;
+  padding: var(--s2) var(--s2) var(--s5);
+  background: var(--bg-base);
 }
 
 .index-page--result {
   display: block;
   padding: 0;
+  background: var(--bg-base);
 }
 
 .index-page__chart {
   width: 100%;
-  border-radius: 8px;
-  overflow: hidden;
-  background: #161b22;
-  margin-bottom: 8px;
+  margin-bottom: var(--s2);
 }
 
 .index-page__panel {
@@ -38,24 +39,27 @@
 
 .index-page__title {
   display: block;
-  font-size: 40px;
-  font-weight: 700;
-  margin-bottom: 16px;
+  font-size: 56px;
+  font-weight: 800;
+  color: var(--t1);
+  letter-spacing: 0.1em;
+  margin-bottom: var(--s4);
 }
 
 .index-page__hint {
   display: block;
   font-size: 24px;
-  color: #8b949e;
+  color: var(--t3);
   line-height: 1.6;
 }
 
 .index-page__retry {
-  margin-top: 24px;
-  background: #238636;
+  margin-top: var(--s5);
+  background: var(--accent);
   color: #fff;
   border: none;
-  border-radius: 8px;
-  padding: 12px 24px;
+  border-radius: var(--r-md);
+  padding: var(--s3) var(--s5);
   font-size: 24px;
+  box-shadow: var(--glow-accent);
 }

@@ -1,0 +1,398 @@
+/* 起始页 —— 游戏化交易终端。深空黑打底 + 霓虹强调 + 发光 CTA。 */
+
+.home {
+  position: relative;
+  min-height: 100vh;
+  box-sizing: border-box;
+  background: var(--bg-void);
+  overflow: hidden;
+}
+
+/* ── K 线背景装饰（铺底，不可点） ── */
+.home__bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.home__grid {
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+      0deg,
+      rgba(48, 54, 61, 0.18) 0,
+      rgba(48, 54, 61, 0.18) 1px,
+      transparent 1px,
+      transparent 56px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(48, 54, 61, 0.18) 0,
+      rgba(48, 54, 61, 0.18) 1px,
+      transparent 1px,
+      transparent 56px
+    );
+}
+
+.home__candles {
+  position: absolute;
+  left: -4%;
+  right: -4%;
+  bottom: 8%;
+  top: 12%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  opacity: 0.1;
+  animation: home-drift 20s linear infinite;
+}
+
+.home__candle-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  position: relative;
+}
+
+.home__wick {
+  width: 2px;
+  border-radius: 2px;
+}
+
+.home__wick--up {
+  background: var(--up);
+}
+
+.home__wick--down {
+  background: var(--down);
+}
+
+.home__body {
+  width: 60%;
+  border-radius: 2px;
+}
+
+.home__body--up {
+  background: var(--up);
+}
+
+.home__body--down {
+  background: var(--down);
+}
+
+.home__bg-mask {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(6, 9, 15, 0.2) 0%,
+    rgba(6, 9, 15, 0.6) 55%,
+    var(--bg-void) 100%
+  );
+}
+
+/* ── 内容层 ── */
+.home__content {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: var(--s7) var(--s5);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* 品牌 */
+.home__brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: var(--s6);
+}
+
+.home__title {
+  font-size: 64px;
+  font-weight: 800;
+  color: var(--t1);
+  letter-spacing: 0.12em;
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.6);
+}
+
+.home__title-bar {
+  width: 200px;
+  height: 4px;
+  margin-top: var(--s3);
+  border-radius: var(--r-pill);
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  box-shadow: var(--glow-gold);
+}
+
+.home__slogan {
+  margin-top: var(--s4);
+  font-size: 26px;
+  color: var(--t3);
+  letter-spacing: 0.04em;
+}
+
+/* 最佳战绩 */
+.home__record {
+  display: flex;
+  margin: var(--s6) 0;
+  padding: var(--s4) 0;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-card);
+}
+
+.home__rec-cell {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s2);
+}
+
+.home__rec-cell--mid {
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+}
+
+.home__rec-label {
+  font-size: 22px;
+  color: var(--t3);
+}
+
+.home__rec-val {
+  font-size: 40px;
+  font-weight: 700;
+  color: var(--t1);
+  line-height: 1.1;
+}
+
+.home__rec-val--up {
+  color: var(--up);
+}
+
+.home__rec-val--down {
+  color: var(--down);
+}
+
+.home__rec-val--rate {
+  color: var(--accent);
+}
+
+.home__rec-val--empty {
+  color: var(--t4);
+}
+
+/* 新手引导三步 */
+.home__steps {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--s3);
+}
+
+.home__step {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s2);
+  padding: var(--s3) var(--s2);
+  background: rgba(28, 34, 48, 0.5);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+}
+
+.home__step-icon {
+  font-size: 40px;
+  line-height: 1;
+}
+
+.home__step-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--t2);
+}
+
+.home__step-desc {
+  font-size: 20px;
+  color: var(--t3);
+}
+
+.home__step-desc--warn {
+  color: var(--up);
+}
+
+/* 主 CTA + 玩法链接 */
+.home__footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: var(--s6);
+}
+
+.home__cta {
+  width: 100%;
+  height: 88px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent);
+  border-radius: var(--r-md);
+  box-shadow: var(--glow-accent);
+  animation: home-pulse 2.2s ease-in-out infinite;
+  transition: transform 0.12s ease;
+}
+
+.home__cta:active {
+  transform: scale(0.98);
+}
+
+.home__cta-text {
+  font-size: 32px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.08em;
+}
+
+.home__more {
+  margin-top: var(--s4);
+  font-size: 24px;
+  color: var(--t3);
+  padding: var(--s2) var(--s3);
+}
+
+/* ── 玩法说明底部 sheet ── */
+.home__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: flex-end;
+}
+
+.home__sheet {
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--bg-surface);
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+  border-top: 1px solid var(--border-hi);
+  padding: var(--s5);
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.55);
+  animation: home-rise 0.26s ease-out;
+}
+
+.home__sheet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--s4);
+}
+
+.home__sheet-title {
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--t1);
+}
+
+.home__sheet-close {
+  font-size: 30px;
+  color: var(--t3);
+  padding: var(--s1) var(--s3);
+}
+
+.home__rule {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s3);
+  margin-bottom: var(--s4);
+}
+
+.home__rule-no {
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  line-height: 36px;
+  text-align: center;
+  border-radius: var(--r-pill);
+  background: var(--accent);
+  color: #fff;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.home__rule-text {
+  flex: 1;
+  font-size: 26px;
+  color: var(--t2);
+  line-height: 1.7;
+}
+
+.home__rule-warn {
+  color: var(--up);
+  font-weight: 700;
+}
+
+.home__sheet-btn {
+  margin-top: var(--s3);
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent);
+  border-radius: var(--r-md);
+  box-shadow: var(--glow-accent);
+}
+
+.home__sheet-btn-text {
+  font-size: 28px;
+  font-weight: 700;
+  color: #fff;
+}
+
+/* ── 动效（GPU 友好） ── */
+@keyframes home-drift {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-24px);
+  }
+}
+
+@keyframes home-pulse {
+  0%,
+  100% {
+    box-shadow: var(--glow-accent);
+  }
+  50% {
+    box-shadow: 0 0 18px var(--accent-glow), 0 6px 22px rgba(61, 139, 255, 0.2);
+  }
+}
+
+@keyframes home-rise {
+  0% {
+    transform: translateY(100%);
+    opacity: 0.4;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* 降级：尊重 reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .home__candles,
+  .home__cta,
+  .home__sheet {
+    animation: none;
+  }
+}

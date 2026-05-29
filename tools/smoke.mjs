@@ -1,6 +1,12 @@
 // Headless browser smoke test: serves dist/, drives the H5 build with system Chrome,
-// collects console/runtime errors, plays a full game loop, screenshots.
-// Run: node tools/smoke.mjs
+// collects console/runtime errors, plays a full game loop across all three screens,
+// and screenshots each. Run: node tools/smoke.mjs
+//
+// Flow (adapted to the new start screen):
+//   load home → /tmp/ui-home.png
+//   click "开始挑战" → game (chart) → /tmp/ui-game.png
+//   buy 50% → drive day-by-day (skip-to-resume on halt) → result → /tmp/ui-result.png
+// Any pageError fails the run.
 import http from 'node:http'
 import { readFile } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
@@ -34,6 +40,7 @@ const server = http.createServer(async (req, res) => {
 })
 
 const log = (...a) => console.log(...a)
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 
 async function main() {
   await new Promise((r) => server.listen(PORT, r))
@@ -54,75 +61,121 @@ async function main() {
   page.on('pageerror', (e) => pageErrors.push(e.message))
   page.on('requestfailed', (r) => failedReqs.push(`${r.url()} ${r.failure()?.errorText}`))
 
-  await page.goto(`http://localhost:${PORT}/`, { waitUntil: 'networkidle0', timeout: 30000 })
-  await new Promise((r) => setTimeout(r, 2500)) // let level load + chart init
-
-  // Click the deepest element whose trimmed text equals `label` (Taro H5 attaches
-  // onClick to the rendered View/Button element, so a DOM .click() fires the handler).
+  // Click the deepest element whose trimmed, space-collapsed text CONTAINS `label`.
+  // Taro H5 attaches onClick to the rendered View/Button DOM node, so a native
+  // .click() fires the handler. We match by `contains` so decorative glyphs in the
+  // label (e.g. "▶  开始挑战") still resolve to the right node.
   const clickByText = (label) => page.evaluate((label) => {
+    const norm = (s) => (s || '').replace(/\s+/g, ' ').trim()
     const all = [...document.querySelectorAll('*')]
-    const matches = all.filter((el) => {
-      const t = (el.innerText || el.textContent || '').replace(/\s+/g, ' ').trim()
-      return t === label
-    })
-    // deepest = the one with fewest matching descendants
-    const target = matches.sort((a, b) => b.compareDocumentPosition(a) & 16 ? -1 : 1)[matches.length - 1] || matches[0]
-    if (target) { target.click(); return true }
-    return false
+    const matches = all.filter((el) => norm(el.innerText || el.textContent).includes(label))
+    if (!matches.length) return false
+    // deepest = the node with the shortest matching text (fewest extra descendants)
+    matches.sort((a, b) => norm(a.innerText || a.textContent).length - norm(b.innerText || b.textContent).length)
+    matches[0].click()
+    return true
   }, label)
+
+  const appText = () => page.evaluate(() => (document.querySelector('#app')?.innerText || ''))
 
   const snap = async () => page.evaluate(() => {
     const txt = (document.querySelector('#app')?.innerText || '').replace(/\s+/g, ' ').trim()
     return {
       appTextLen: txt.length,
-      appTextHead: txt.slice(0, 240),
+      appTextHead: txt.slice(0, 200),
       hasCanvas: !!document.querySelector('canvas'),
     }
   })
 
-  const initial = await snap()
-  await page.screenshot({ path: '/tmp/smoke-gameplay.png' }).catch(() => {})
-  log('[smoke] initial render:', JSON.stringify(initial, null, 2))
+  // ---- Screen 1: home ----------------------------------------------------
+  await page.goto(`http://localhost:${PORT}/`, { waitUntil: 'networkidle0', timeout: 30000 })
+  await sleep(800)
+  const home = await snap()
+  const homeText = await appText()
+  const homeOk = /开始挑战/.test(homeText) && !home.hasCanvas
+  await page.screenshot({ path: '/tmp/ui-home.png' }).catch(() => {})
+  log('[smoke] HOME:', JSON.stringify({ ...home, homeOk }, null, 2))
 
-  // Try one buy at 50% to exercise the trade path, then drive day-by-day to the result.
+  // ---- Transition: start the game ---------------------------------------
+  const startClicked = await clickByText('开始挑战')
+  // wait for the chart canvas to mount (level load + klinecharts init)
+  let canvasUp = false
+  for (let i = 0; i < 40; i++) {
+    await sleep(150)
+    canvasUp = await page.evaluate(() => !!document.querySelector('canvas'))
+    if (canvasUp) break
+  }
+  await sleep(600) // settle chart paint
+
+  // ---- Screen 2: game ----------------------------------------------------
+  const game = await snap()
+  const gameOk = startClicked && game.hasCanvas && game.appTextLen > 0
+  await page.screenshot({ path: '/tmp/ui-game.png' }).catch(() => {})
+  log('[smoke] GAME:', JSON.stringify({ ...game, startClicked, gameOk }, null, 2))
+
+  // ---- Play: buy 50%, then drive day-by-day to the result ----------------
+  // The trade panel now has a "买入"/"卖出" segment header AND a primary action
+  // button labelled "买入 +N 股". Click the action button (it contains "股"),
+  // not the segment toggle, so a real trade fires.
   let boughtOk = false
   try {
-    await clickByText('买入')
-    await new Promise((r) => setTimeout(r, 200))
-    const afterBuy = await page.evaluate(() => (document.querySelector('#app')?.innerText || ''))
-    boughtOk = !/持仓市值 0\.00/.test(afterBuy) // holdings became non-zero
+    const clicked = await page.evaluate(() => {
+      const norm = (s) => (s || '').replace(/\s+/g, ' ').trim()
+      const all = [...document.querySelectorAll('*')]
+      const cands = all.filter((el) => {
+        const t = norm(el.innerText || el.textContent)
+        return /^买入\s*[+＋]?\s*[\d,]+\s*股$/.test(t)
+      })
+      if (!cands.length) return false
+      cands.sort((a, b) => norm(a.innerText).length - norm(b.innerText).length)
+      cands[0].click()
+      return true
+    })
+    await sleep(200)
+    const afterBuy = (await appText()).replace(/\s+/g, ' ')
+    boughtOk = clicked && !/持仓\s*0\s*股/.test(afterBuy)
   } catch { /* ignore */ }
 
   let rounds = 0, reachedResult = false, clickErr = null
-  for (let i = 0; i < 80; i++) {
-    const cur = await page.evaluate(() => (document.querySelector('#app')?.innerText || ''))
+  for (let i = 0; i < 120; i++) {
+    const cur = await appText()
     if (/再来一局/.test(cur)) { reachedResult = true; break }
     try {
-      const skipped = cur.includes('跳到复牌') ? await clickByText('跳到复牌首日') : false
+      const skipped = cur.includes('跳到复牌') ? await clickByText('跳到复牌') : false
       const clicked = skipped || await clickByText('下一日')
       if (clicked) rounds++
-      await new Promise((r) => setTimeout(r, 110))
+      else break // nothing actionable left
+      await sleep(90)
     } catch (e) { clickErr = String(e); break }
   }
 
-  const final = await snap()
-  await page.screenshot({ path: '/tmp/smoke-final.png' }).catch(() => {})
-  log('[smoke] after driving game:', JSON.stringify({ boughtOk, rounds, reachedResult, finalHead: final.appTextHead }, null, 2))
+  // ---- Screen 3: result --------------------------------------------------
+  await sleep(400)
+  const result = await snap()
+  const resultOk = reachedResult && /再来一局/.test(await appText())
+  await page.screenshot({ path: '/tmp/ui-result.png' }).catch(() => {})
+  log('[smoke] RESULT:', JSON.stringify({ ...result, boughtOk, rounds, reachedResult, resultOk }, null, 2))
 
   await browser.close()
   server.close()
 
-  const ok = pageErrors.length === 0 && initial.appTextLen > 0 && initial.hasCanvas
+  const ok =
+    pageErrors.length === 0 &&
+    homeOk &&
+    gameOk &&
+    resultOk
+
   log('\n========== SMOKE REPORT ==========')
-  log('renderedNonEmpty :', initial.appTextLen > 0)
-  log('canvasPresent    :', initial.hasCanvas)
+  log('HOME   page PASS :', homeOk, '(开始挑战 present, no canvas)')
+  log('GAME   page PASS :', gameOk, '(canvas mounted after start)')
+  log('RESULT page PASS :', resultOk, '(再来一局 reached)')
+  log('boughtOk         :', boughtOk)
+  log('gameRoundsClicked:', rounds)
   log('pageErrors       :', pageErrors.length, pageErrors.slice(0, 5))
   log('consoleErrors    :', consoleErrors.length, consoleErrors.slice(0, 5))
   log('failedRequests   :', failedReqs.length, failedReqs.slice(0, 5))
-  log('gameRoundsClicked:', rounds)
-  log('reachedResult    :', reachedResult)
   log('clickError       :', clickErr)
-  log('screenshot       : /tmp/smoke-final.png')
+  log('screenshots      : /tmp/ui-home.png  /tmp/ui-game.png  /tmp/ui-result.png')
   log('VERDICT          :', ok ? 'PASS' : 'FAIL')
   log('==================================')
   process.exit(ok ? 0 : 1)

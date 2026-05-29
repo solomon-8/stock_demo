@@ -27,8 +27,12 @@ import {
 } from '../engine'
 import { loadRandomLevel } from '../data'
 
-/** 加载阶段。 */
-export type LoadPhase = 'loading' | 'ready' | 'error'
+/**
+ * 加载阶段。
+ * - home：起始页（初始态，尚未抽关，等待玩家点「开始挑战」）。
+ * - loading / ready / error：加载关卡的生命周期。
+ */
+export type LoadPhase = 'home' | 'loading' | 'ready' | 'error'
 
 /** 派生视图数据（供页面/组件直接消费，全部已脱敏）。 */
 export interface GameView {
@@ -68,6 +72,8 @@ export interface UseGameResult {
   result?: SettleResult
   /** 派发一个引擎动作。 */
   dispatch: (action: Action) => void
+  /** 从起始页开始游戏（抽关进 loading）；仅在 phase==='home' 时有意义。 */
+  start: () => void
   /** 再来一局（重新随机抽关并重置状态）。 */
   restart: () => void
 }
@@ -83,17 +89,20 @@ function closeAt(level: LevelPack, day: number): number {
  * @param seedExcludeLevelIds 可选：重开时尽量避开这些关卡 ID（防止连续抽到同一关）。
  */
 export function useGame(): UseGameResult {
-  const [phase, setPhase] = useState<LoadPhase>('loading')
+  // 初始态为起始页：不立即抽关，等玩家点「开始挑战」(start) 才进 loading。
+  const [phase, setPhase] = useState<LoadPhase>('home')
   const [error, setError] = useState<string | undefined>(undefined)
   const [level, setLevel] = useState<LevelPack | undefined>(undefined)
   const [state, setState] = useState<GameState | undefined>(undefined)
   // 已玩过的关卡 ID，重开时尽量避开（候选耗尽时加载器自会回退）。
   const [played, setPlayed] = useState<string[]>([])
-  // 自增触发器：每次 restart +1，触发重新加载。
+  // 自增触发器：round 0 = 起始页(不加载)；start/restart 各 +1 触发(重)加载。
   const [round, setRound] = useState(0)
 
   // 加载关卡 + 初始化引擎状态。
   useEffect(() => {
+    // 首帧 round===0 处于起始页(home)，不自动抽关；待 start() 把 round 推到 1 才加载。
+    if (round === 0) return
     let cancelled = false
     setPhase('loading')
     setError(undefined)
@@ -123,6 +132,11 @@ export function useGame(): UseGameResult {
     },
     [level],
   )
+
+  const start = useCallback(() => {
+    // 起始页点「开始挑战」：从 home 推进到首次加载。
+    setRound((r) => r + 1)
+  }, [])
 
   const restart = useCallback(() => {
     setPlayed((prev) =>
@@ -171,6 +185,7 @@ export function useGame(): UseGameResult {
     view,
     result,
     dispatch,
+    start,
     restart,
   }
 }

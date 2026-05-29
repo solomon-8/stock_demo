@@ -1,6 +1,7 @@
 import { PropsWithChildren } from 'react'
 import { useLaunch } from '@tarojs/taro'
 
+import './styles/tokens.css'
 import './app.css'
 
 function App({ children }: PropsWithChildren) {

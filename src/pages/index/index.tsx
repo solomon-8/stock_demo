@@ -11,16 +11,34 @@
  *
  * 布局：移动优先，单列纵向滚动；上为 K 线图，下为交易面板；结束后整页替换为 Result 复盘。
  */
+import { useEffect, useRef } from 'react'
 import { View, Text, Button, ScrollView } from '@tarojs/components'
 import Chart from '../../components/Chart'
 import TradePanel from '../../components/TradePanel'
 import Result from '../../components/Result'
-import { useGame } from '../../store'
+import StartScreen from '../../components/StartScreen'
+import { useGame, useStats } from '../../store'
 import './index.css'
 
 export default function Index() {
-  const { phase, error, level, state, view, result, dispatch, restart } =
+  const { phase, error, level, state, view, result, dispatch, start, restart } =
     useGame()
+  const { stats, record } = useStats()
+
+  // 结算时记一局战绩（本地持久化，不进引擎）。每局仅记一次：以 level+finalAssets 为去重键。
+  const recordedKeyRef = useRef<string | undefined>(undefined)
+  useEffect(() => {
+    if (!view?.finished || !result || !level) return
+    const key = `${level.levelId}:${result.finalAssets}`
+    if (recordedKeyRef.current === key) return
+    recordedKeyRef.current = key
+    record(result.roi)
+  }, [view?.finished, result, level, record])
+
+  // 起始页：等玩家点「开始挑战」才抽关
+  if (phase === 'home') {
+    return <StartScreen stats={stats} onStart={start} />
+  }
 
   // 加载中
   if (phase === 'loading') {

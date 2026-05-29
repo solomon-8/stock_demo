@@ -1,85 +1,141 @@
+/* 结算 / 复盘 —— 游戏化交易终端。战绩卡 + 评级开奖 + 金辉分享 CTA。
+   全部使用 src/styles/tokens.css 设计令牌；红涨绿跌；禁用 ::before/::after/:nth-child。 */
+
 .result {
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  padding: 32px 24px 48px;
+  gap: var(--s5);
+  padding: var(--s6) var(--s5) var(--s7);
   box-sizing: border-box;
 }
 
-/* 头部成绩 */
+/* 红涨绿跌通用着色（替代内联颜色，逐处复用） */
+.result--up {
+  color: var(--up);
+}
+.result--down {
+  color: var(--down);
+}
+
+/* ── 头部成绩（战绩卡主战场）── */
 .result__header {
   display: flex;
   align-items: center;
-  gap: 28px;
+  gap: var(--s6);
 }
 
 .result__grade {
+  position: relative;
   flex: 0 0 auto;
   width: 132px;
   height: 132px;
-  border: 6px solid #8b949e;
+  border: 6px solid var(--t3);
   border-radius: 50%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
+  background: var(--bg-surface);
+}
+
+/* 旋转光环（仅 S/A），叠层 View，conic 渐变 */
+.result__grade-halo {
+  position: absolute;
+  inset: -30%;
+  border-radius: 50%;
+  opacity: 0.55;
+  animation: result-spin 6s linear infinite;
+  pointer-events: none;
 }
 
 .result__grade-letter {
+  position: relative;
+  z-index: 1;
   font-size: 72px;
   font-weight: 800;
   line-height: 1;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
 }
 
 .result__grade-label {
-  margin-top: 6px;
-  font-size: 22px;
+  position: relative;
+  z-index: 1;
+  margin-top: var(--s1);
+  font-size: 24px;
+  font-weight: 600;
+}
+
+/* 入场"开奖"：缩放回弹 */
+.result__grade--enter {
+  animation: result-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
 .result__score {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--s2);
+  animation: result-fade-up 0.5s ease-out 0.12s both;
 }
 
 .result__roi {
-  font-size: 56px;
+  font-size: 72px;
   font-weight: 800;
-  line-height: 1.1;
+  line-height: 1.05;
 }
 
 .result__assets {
   font-size: 26px;
-  color: #c9d1d9;
+  color: var(--t3);
 }
 
 .result__profit {
-  font-size: 26px;
-  font-weight: 600;
+  font-size: 28px;
+  font-weight: 700;
 }
 
-/* 卡片 */
+.result__profit-base {
+  font-size: 22px;
+  font-weight: 400;
+  color: var(--t4);
+}
+
+/* ── 战绩标语（截图钩子）── */
+.result__slogan {
+  margin-top: calc(-1 * var(--s2));
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--gold);
+  text-align: center;
+  letter-spacing: 0.02em;
+  text-shadow: 0 0 18px var(--gold-glow);
+  animation: result-fade-up 0.5s ease-out 0.24s both;
+}
+
+/* ── 卡片 ── */
 .result__card {
-  background: #161b22;
-  border: 1px solid #21262d;
-  border-radius: 16px;
-  padding: 24px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: var(--s5);
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--s4);
+  box-shadow: var(--shadow-card);
 }
 
 .result__card-title {
   font-size: 26px;
   font-weight: 700;
-  color: #f0f6fc;
+  color: var(--t1);
 }
 
-/* buy&hold 对比 */
+/* ── buy&hold 对比（双列 + VS 高亮）── */
 .result__compare {
   display: flex;
-  gap: 16px;
+  align-items: stretch;
+  gap: var(--s3);
 }
 
 .result__compare-col {
@@ -87,63 +143,90 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  padding: 16px 0;
-  background: #0d1117;
-  border-radius: 12px;
+  justify-content: center;
+  gap: var(--s2);
+  padding: var(--s4) var(--s2);
+  background: var(--bg-sunken);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+}
+
+/* 胜者列：红光描边高亮 */
+.result__compare-col--win {
+  border-color: transparent;
+  box-shadow: 0 0 0 1px var(--up), 0 0 16px var(--up-glow);
+}
+
+.result__compare-vs {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+}
+
+.result__compare-vs-text {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--t4);
+  letter-spacing: 0.08em;
 }
 
 .result__compare-cap {
   font-size: 22px;
-  color: #8b949e;
+  color: var(--t3);
 }
 
 .result__compare-val {
   font-size: 40px;
-  font-weight: 700;
+  font-weight: 800;
 }
 
 .result__compare-verdict {
   font-size: 26px;
   font-weight: 600;
   text-align: center;
+  color: var(--t3);
 }
 
-/* 揭盘 */
+.result__compare-verdict--win {
+  color: var(--gold);
+  text-shadow: 0 0 14px var(--gold-glow);
+}
+
+/* ── 揭盘 ── */
 .result__tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: var(--s3);
 }
 
 .result__tag {
   font-size: 22px;
-  color: #f5a623;
-  background: rgba(245, 166, 35, 0.12);
-  border: 1px solid rgba(245, 166, 35, 0.4);
-  border-radius: 999px;
-  padding: 4px 16px;
+  color: var(--gold);
+  background: rgba(255, 197, 61, 0.1);
+  border: 1px solid rgba(255, 197, 61, 0.45);
+  border-radius: var(--r-pill);
+  padding: var(--s1) var(--s4);
 }
 
 .result__truths {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--s2);
 }
 
 .result__truth {
   font-size: 24px;
-  color: #ffa198;
+  color: var(--up-bright);
   line-height: 1.5;
 }
 
 .result__story {
   font-size: 24px;
-  color: #c9d1d9;
+  color: var(--t2);
   line-height: 1.7;
 }
 
-/* 交易回顾 */
+/* ── 交易回顾 ── */
 .result__history {
   max-height: 360px;
 }
@@ -151,22 +234,22 @@
 .result__history-row {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 0;
-  border-bottom: 1px solid #21262d;
+  gap: var(--s3);
+  padding: var(--s3) 0;
+  border-bottom: 1px solid var(--border);
   font-size: 24px;
-  color: #c9d1d9;
+  color: var(--t2);
 }
 
 .result__history-day {
   flex: 0 0 110px;
-  color: #8b949e;
+  color: var(--t3);
 }
 
 .result__history-action {
   flex: 0 0 80px;
-  font-weight: 600;
-  color: #f0f6fc;
+  font-weight: 700;
+  color: var(--t1);
 }
 
 .result__history-price {
@@ -174,15 +257,15 @@
 }
 
 .result__history-pos {
-  flex: 0 0 140px;
+  flex: 0 0 150px;
   text-align: right;
 }
 
-/* 按钮 */
+/* ── 按钮 ── */
 .result__actions {
   display: flex;
-  gap: 16px;
-  margin-top: 8px;
+  gap: var(--s4);
+  margin-top: var(--s2);
 }
 
 .result__btn {
@@ -190,18 +273,80 @@
   height: 88px;
   line-height: 88px;
   font-size: 30px;
-  font-weight: 600;
-  border-radius: 12px;
+  font-weight: 700;
+  border-radius: var(--r-md);
   padding: 0;
+  transition: transform 0.12s ease;
 }
 
+.result__btn:active {
+  transform: scale(0.98);
+}
+
+/* 主 CTA：晒战绩 —— 金辉呼吸 */
 .result__btn--primary {
-  background: #f5a623;
-  color: #0d1117;
+  background: var(--gold);
+  color: #2a1d00;
+  box-shadow: var(--glow-gold);
+  animation: result-pulse 2.2s ease-in-out infinite;
 }
 
+/* 次级：再来一局 —— 中性蓝描边 */
 .result__btn--ghost {
   background: transparent;
-  color: #c9d1d9;
-  border: 1px solid #30363d;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+}
+
+/* ── 动效（GPU 友好：transform / box-shadow / opacity）── */
+@keyframes result-pop {
+  0% {
+    transform: scale(0.4) rotate(-12deg);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1) rotate(0);
+    opacity: 1;
+  }
+}
+
+@keyframes result-fade-up {
+  0% {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes result-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes result-pulse {
+  0%,
+  100% {
+    box-shadow: var(--glow-gold);
+  }
+  50% {
+    box-shadow: 0 0 16px var(--gold-glow), 0 0 6px rgba(255, 197, 61, 0.6);
+  }
+}
+
+/* 降级：尊重 reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .result__grade--enter,
+  .result__grade-halo,
+  .result__score,
+  .result__slogan,
+  .result__btn--primary {
+    animation: none;
+  }
 }

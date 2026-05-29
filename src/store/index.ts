@@ -10,3 +10,6 @@ export type {
   GameView,
   LoadPhase,
 } from './useGame'
+
+export { useStats, mergeResult, STATS_KEY } from './useStats'
+export type { Stats, UseStatsResult } from './useStats'

@@ -7,9 +7,12 @@
  *
  * 交互规则（UI 层）：
  * - 买入按现金百分比（含 25/50/75/100 快捷档），卖出按持仓百分比。
+ * - 买入 / 卖出通过 segmented 分段切换，同一时刻只暴露一种操作（降误触）。
  * - 停牌时（tradable=false）禁用买/卖按钮与滑条，价格冻结仅展示。
  * - "跳到复牌首日"按钮仅在 skipToResumeVisible=true（超长停牌）时出现。
  * - 退市 / 结束（finished）时禁用全部交易操作。
+ *
+ * 视觉：游戏化交易终端令牌（红涨绿跌、tabular-nums、发光 CTA）。仅样式与结构改动，props 契约不变。
  */
 import { useState } from 'react'
 import { View, Text, Slider, Button } from '@tarojs/components'
@@ -50,11 +53,18 @@ export interface TradePanelProps {
 /** 快捷档百分比（用于买入按现金% / 卖出按持仓%） */
 const QUICK_RATIOS = [25, 50, 75, 100] as const
 
+/** 交易方向（UI 内部分段状态） */
+type Side = 'buy' | 'sell'
+
 function formatMoney(n: number): string {
   return n.toLocaleString('en-US', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })
+}
+
+function formatInt(n: number): string {
+  return Math.round(n).toLocaleString('en-US')
 }
 
 function formatPct(p: number): string {
@@ -80,186 +90,217 @@ export default function TradePanel(props: TradePanelProps) {
     onSkipToResume,
   } = props
 
-  // 滑条百分比为本组件内部 UI 状态（0~100），下沉为比例后再回调，不持有业务状态。
+  // 分段方向 + 各自滑条百分比（0~100），均为本组件内部 UI 状态，不持有业务状态。
+  const [side, setSide] = useState<Side>('buy')
   const [buyPct, setBuyPct] = useState(50)
   const [sellPct, setSellPct] = useState(50)
 
   // 派生展示值（纯计算，不可变）
   const positionValue = shares * price
   const totalAssets = cash + positionValue
-  const changeClass =
-    changePct === undefined
-      ? 'trade-panel__delta'
-      : changePct > 0
-        ? 'trade-panel__delta trade-panel__delta--up'
-        : changePct < 0
-          ? 'trade-panel__delta trade-panel__delta--down'
-          : 'trade-panel__delta'
+
+  // 当日涨跌方向 → 胶囊 / 总资产数字配色
+  const upDay = changePct !== undefined && changePct > 0
+  const downDay = changePct !== undefined && changePct < 0
 
   // 是否禁用交易操作：停牌、已结束。
   const tradingDisabled = !tradable || finished
   const canBuy = tradingDisabled ? false : cash > 0
   const canSell = tradingDisabled ? false : shares > 0
 
+  // 当前分段派生
+  const isBuy = side === 'buy'
+  const pct = isBuy ? buyPct : sellPct
+  const setPct = isBuy ? setBuyPct : setSellPct
+  const canAct = isBuy ? canBuy : canSell
+
+  // 实时预估（仅展示，引擎为最终裁决）
+  const estBuyShares = price > 0 ? Math.floor((cash * (buyPct / 100)) / price) : 0
+  const estSellShares = Math.floor(shares * (sellPct / 100))
+  const estShares = isBuy ? estBuyShares : estSellShares
+  const estAmount = isBuy ? estBuyShares * price : estSellShares * price
+
   return (
     <View className="trade-panel">
-      {/* 资产概览 */}
+      {/* ── 盘面数据卡：总资产独占首行 + 三栏次级 + 当日涨跌胶囊 ── */}
       <View className="trade-panel__summary">
-        <View className="trade-panel__summary-row">
-          <Text className="trade-panel__label">现金</Text>
-          <Text className="trade-panel__value">{formatMoney(cash)}</Text>
-        </View>
-        <View className="trade-panel__summary-row">
-          <Text className="trade-panel__label">持仓市值</Text>
-          <Text className="trade-panel__value">
-            {formatMoney(positionValue)}
-            <Text className="trade-panel__sub"> （{shares} 股）</Text>
-          </Text>
-        </View>
-        <View className="trade-panel__summary-row">
+        <View className="trade-panel__assets">
           <Text className="trade-panel__label">总资产</Text>
-          <Text className="trade-panel__value trade-panel__value--strong">
-            {formatMoney(totalAssets)}
-          </Text>
-        </View>
-        <View className="trade-panel__summary-row">
-          <Text className="trade-panel__label">当日价</Text>
-          <Text className="trade-panel__value">
-            {formatMoney(price)}
+          <View className="trade-panel__assets-line">
+            <Text className="trade-panel__value trade-panel__value--strong num">
+              {formatMoney(totalAssets)}
+            </Text>
             {changePct !== undefined && (
-              <Text className={changeClass}> {formatPct(changePct)}</Text>
+              <Text
+                className={
+                  upDay
+                    ? 'trade-panel__chip trade-panel__chip--up num'
+                    : downDay
+                      ? 'trade-panel__chip trade-panel__chip--down num'
+                      : 'trade-panel__chip trade-panel__chip--flat num'
+                }
+              >
+                {upDay ? '▲ ' : downDay ? '▼ ' : ''}
+                {formatPct(changePct)}
+              </Text>
             )}
-          </Text>
+          </View>
         </View>
-        <View className="trade-panel__summary-row">
-          <Text className="trade-panel__label">剩余天数</Text>
-          <Text className="trade-panel__value">
-            {daysLeft}
-            {totalDays !== undefined && (
-              <Text className="trade-panel__sub"> / {totalDays}</Text>
-            )}
+
+        <View className="trade-panel__stats">
+          <View className="trade-panel__stat">
+            <Text className="trade-panel__stat-label">现金</Text>
+            <Text className="trade-panel__stat-val num">{formatMoney(cash)}</Text>
+          </View>
+          <View className="trade-panel__stat trade-panel__stat--mid">
+            <Text className="trade-panel__stat-label">持仓</Text>
+            <Text className="trade-panel__stat-val num">{formatInt(shares)} 股</Text>
+          </View>
+          <View className="trade-panel__stat">
+            <Text className="trade-panel__stat-label">当日价</Text>
+            <Text className="trade-panel__stat-val num">{formatMoney(price)}</Text>
+          </View>
+        </View>
+
+        <View className="trade-panel__progress">
+          <Text className="trade-panel__progress-text num">
+            剩余 {daysLeft}
+            {totalDays !== undefined ? ` / ${totalDays}` : ''} 日
           </Text>
         </View>
       </View>
 
-      {/* 停牌 / 跳复牌 */}
+      {/* ── 停牌 / 结束态 ── */}
       {!tradable && !finished && (
         <View className="trade-panel__halt">
-          <Text className="trade-panel__halt-text">停牌中 · 价格冻结，无法买卖</Text>
+          <Text className="trade-panel__halt-text">⏸ 停牌中 · 价格冻结，无法买卖</Text>
           {skipToResumeVisible && (
             <Button
               className="trade-panel__btn trade-panel__btn--resume"
               onClick={onSkipToResume}
             >
-              跳到复牌首日
+              跳到复牌首日 ⏩
             </Button>
           )}
         </View>
       )}
 
       {finished && (
-        <View className="trade-panel__halt">
-          <Text className="trade-panel__halt-text">本局已结束</Text>
+        <View className="trade-panel__halt trade-panel__halt--done">
+          <Text className="trade-panel__halt-text trade-panel__halt-text--done">
+            本局已结束
+          </Text>
         </View>
       )}
 
-      {/* 买入区 */}
-      <View className="trade-panel__section">
-        <View className="trade-panel__section-head">
-          <Text className="trade-panel__section-title">买入</Text>
-          <Text className="trade-panel__section-meta">按现金 {buyPct}%</Text>
-        </View>
-        <Slider
-          className="trade-panel__slider"
-          min={0}
-          max={100}
-          step={1}
-          value={buyPct}
-          disabled={!canBuy}
-          showValue
-          onChange={(e) => setBuyPct(e.detail.value)}
-        />
-        <View className="trade-panel__quick">
-          {QUICK_RATIOS.map((r) => (
-            <Button
-              key={`buy-${r}`}
+      {/* ── 交易区（分段切换：买 / 卖；仅在可交易且未结束时展示完整操作）── */}
+      {!finished && (
+        <View className="trade-panel__trade">
+          {/* 分段切换 */}
+          <View className="trade-panel__segment">
+            <View
               className={
-                buyPct === r
-                  ? 'trade-panel__quick-btn trade-panel__quick-btn--active'
-                  : 'trade-panel__quick-btn'
+                isBuy
+                  ? 'trade-panel__seg trade-panel__seg--buy trade-panel__seg--active'
+                  : 'trade-panel__seg'
               }
-              disabled={!canBuy}
-              onClick={() => setBuyPct(r)}
+              onClick={() => setSide('buy')}
             >
-              {r}%
-            </Button>
-          ))}
-        </View>
-        <Button
-          className="trade-panel__btn trade-panel__btn--buy"
-          disabled={!canBuy || buyPct <= 0}
-          onClick={() => onBuy(buyPct / 100)}
-        >
-          买入
-        </Button>
-      </View>
-
-      {/* 卖出区 */}
-      <View className="trade-panel__section">
-        <View className="trade-panel__section-head">
-          <Text className="trade-panel__section-title">卖出</Text>
-          <Text className="trade-panel__section-meta">按持仓 {sellPct}%</Text>
-        </View>
-        <Slider
-          className="trade-panel__slider"
-          min={0}
-          max={100}
-          step={1}
-          value={sellPct}
-          disabled={!canSell}
-          showValue
-          onChange={(e) => setSellPct(e.detail.value)}
-        />
-        <View className="trade-panel__quick">
-          {QUICK_RATIOS.map((r) => (
-            <Button
-              key={`sell-${r}`}
+              <Text className="trade-panel__seg-text">买入</Text>
+            </View>
+            <View
               className={
-                sellPct === r
-                  ? 'trade-panel__quick-btn trade-panel__quick-btn--active'
-                  : 'trade-panel__quick-btn'
+                !isBuy
+                  ? 'trade-panel__seg trade-panel__seg--sell trade-panel__seg--active'
+                  : 'trade-panel__seg'
               }
-              disabled={!canSell}
-              onClick={() => setSellPct(r)}
+              onClick={() => setSide('sell')}
             >
-              {r}%
-            </Button>
-          ))}
-        </View>
-        <Button
-          className="trade-panel__btn trade-panel__btn--sell"
-          disabled={!canSell || sellPct <= 0}
-          onClick={() => onSell(sellPct / 100)}
-        >
-          卖出
-        </Button>
-      </View>
+              <Text className="trade-panel__seg-text">卖出</Text>
+            </View>
+          </View>
 
-      {/* 持有 / 推进 */}
+          {/* 快捷档 */}
+          <View className="trade-panel__quick">
+            {QUICK_RATIOS.map((r) => {
+              const active = pct === r
+              const cls = active
+                ? isBuy
+                  ? 'trade-panel__quick-btn trade-panel__quick-btn--buy'
+                  : 'trade-panel__quick-btn trade-panel__quick-btn--sell'
+                : 'trade-panel__quick-btn'
+              return (
+                <Button
+                  key={`${side}-${r}`}
+                  className={cls}
+                  disabled={!canAct}
+                  onClick={() => setPct(r)}
+                >
+                  {r}%
+                </Button>
+              )
+            })}
+          </View>
+
+          {/* 滑条 + 实时预估 */}
+          <Slider
+            className="trade-panel__slider"
+            min={0}
+            max={100}
+            step={1}
+            value={pct}
+            disabled={!canAct}
+            activeColor={isBuy ? '#ff3b3b' : '#00d27a'}
+            blockColor={isBuy ? '#ff5c5c' : '#26ff9c'}
+            backgroundColor="#1c2230"
+            showValue
+            onChange={(e) => setPct(e.detail.value)}
+          />
+          <View className="trade-panel__estimate">
+            <Text className="trade-panel__est-label">
+              {isBuy ? '预计买入' : '预计卖出'}
+            </Text>
+            <Text className="trade-panel__est-val num">
+              {formatInt(estShares)} 股 · ¥{formatMoney(estAmount)}
+            </Text>
+          </View>
+
+          {/* 主操作按钮（随分段变色 + 光晕） */}
+          {isBuy ? (
+            <Button
+              className="trade-panel__btn trade-panel__btn--buy"
+              disabled={!canBuy || buyPct <= 0}
+              onClick={() => onBuy(buyPct / 100)}
+            >
+              买入 +{formatInt(estBuyShares)} 股
+            </Button>
+          ) : (
+            <Button
+              className="trade-panel__btn trade-panel__btn--sell"
+              disabled={!canSell || sellPct <= 0}
+              onClick={() => onSell(sellPct / 100)}
+            >
+              卖出 -{formatInt(estSellShares)} 股
+            </Button>
+          )}
+        </View>
+      )}
+
+      {/* ── 持有 / 推进 ── */}
       <View className="trade-panel__actions">
         <Button
           className="trade-panel__btn trade-panel__btn--hold"
           disabled={finished}
           onClick={onHold}
         >
-          持有
+          持有 →
         </Button>
         <Button
           className="trade-panel__btn trade-panel__btn--advance"
           disabled={finished}
           onClick={onAdvance}
         >
-          下一日
+          下一日 ⏭
         </Button>
       </View>
     </View>

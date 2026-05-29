@@ -1,13 +1,94 @@
-/* K 线图容器。klinecharts 在内部创建 canvas，需要一个有确定尺寸的块级容器。 */
+/**
+ * K 线图组件样式 —— 游戏化交易终端深色盘面。
+ *
+ * 颜色 / 圆角 / 间距全部复用 src/styles/tokens.css 设计令牌（var(--...)），不重定义颜色。
+ * 实现铁律：禁用 ::before / ::after / :nth-child；细线用 box-shadow(inset) 或真实 View。
+ * 画布内部（蜡烛 / 轴 / 指标）配色由 index.tsx 的 CHART_STYLES 通过 klinecharts 注入。
+ */
+
+/* 终端外壳：把 K 线包进带边框 / 标题条的盘面卡片 */
+.kline-shell {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+
+/* 标题条：行情标识 + 脱敏日序，底部一条令牌细分隔线 */
+.kline-shell__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 36px;
+  padding: 0 var(--s3);
+  box-sizing: border-box;
+  background: var(--bg-sunken);
+  box-shadow: var(--inset-line);
+}
+
+.kline-shell__brand {
+  display: flex;
+  align-items: center;
+}
+
+/* 跳动绿点（行情在线感）。红涨绿跌：用中性「在线」语义不冲突，取强调蓝点更稳妥 */
+.kline-shell__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--r-pill);
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent-glow);
+  margin-right: var(--s2);
+  animation: kline-pulse 1.8s ease-in-out infinite;
+}
+
+.kline-shell__title {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--t2);
+  letter-spacing: 0.08em;
+}
+
+.kline-shell__meta {
+  font-size: 20px;
+  color: var(--t3);
+  font-variant-numeric: tabular-nums;
+}
+
+/* K 线画布容器：klinecharts 在内部创建 canvas，需要确定尺寸的块级容器 */
 .kline-chart {
   display: block;
   width: 100%;
-  min-height: 240px;
+  min-height: 200px;
   position: relative;
   box-sizing: border-box;
+  background: var(--bg-surface);
 }
 
-/* H5 下 Taro 的 View 会编译为带 taro 前缀的元素，确保 canvas 充满容器。 */
+/* H5 下 Taro 的 View 会编译为带 taro 前缀的元素，确保 canvas 充满容器 */
 .kline-chart canvas {
   display: block;
+}
+
+@keyframes kline-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.45;
+    transform: scale(0.82);
+  }
+}
+
+/* 动效降级：尊重用户的减少动态偏好 */
+@media (prefers-reduced-motion: reduce) {
+  .kline-shell__dot {
+    animation: none;
+  }
 }

@@ -2,9 +2,9 @@ html,
 body {
   margin: 0;
   padding: 0;
-  background: #0d1117;
-  color: #e6edf3;
-  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', Helvetica, sans-serif;
+  background: var(--bg-void);
+  color: var(--t2);
+  font-family: var(--font-ui);
 }
 
 * {
