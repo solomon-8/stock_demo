@@ -100,6 +100,47 @@ export interface LevelPack {
   }
 }
 
+/**
+ * 单只股票的【全量脱敏序列】（运行时切片架构的批量数据单元）。
+ *
+ * 与 LevelPack（单局窗口）的区别：StockSeries 是一只股票的完整历史，
+ * 客户端在「开始」时随机切出一个窗口（见 sliceLevelFromSeries）构造成 LevelPack 再交给引擎。
+ * 同一只股可切出无数不同的局。
+ *
+ * 脱敏：days 只含相对日序与行情（无真实日期/名称/代码）。
+ * reveal.dates 仅用于结算复盘时还原窗口对应的真实时间段，游戏过程中不渲染。
+ */
+export interface StockSeries {
+  /** 序列唯一 ID（稳定序号，不含真实代码） */
+  seriesId: string
+  /** 全量逐日行情（day 从 0 起连续；含指标与停牌/ST 标记） */
+  days: DayBar[]
+  /** 全量市场事件（停牌/ST/退市，day 为全序列相对日序） */
+  events: MarketEvent[]
+  /** 揭盘数据（仅结算时用） */
+  reveal: {
+    /** 真实股票名称 */
+    realName?: string
+    /** 市场标签，如 'A股 · 沪市' */
+    market?: string
+    /** 与 days 对齐的真实交易日（YYYY-MM-DD），用于还原切片窗口的真实时间段 */
+    dates?: string[]
+  }
+}
+
+/** 序列索引项（series/index.json）。 */
+export interface SeriesIndexEntry {
+  seriesId: string
+  /** 序列总交易日数（用于过滤太短的序列） */
+  days: number
+  file: string
+}
+
+/** 序列索引（series/index.json）。 */
+export interface SeriesIndex {
+  series: SeriesIndexEntry[]
+}
+
 /** 关卡难度 */
 export type LevelDifficulty = 'easy' | 'normal' | 'hard'
 
